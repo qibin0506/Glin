@@ -186,7 +186,7 @@ public class Glin {
             if (mClient == null) {
                 throw new UnsupportedOperationException("invoke client method first");
             }
-
+            mClient.timeout(ms);
             return this;
         }
 
