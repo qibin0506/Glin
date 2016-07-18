@@ -56,7 +56,6 @@ import java.util.Iterator;
 public class Glin {
     private IClient mClient;
     private String mBaseUrl;
-
     private CallMapping mCallMapping;
 
     private Glin(IClient client, String baseUrl) {
@@ -69,6 +68,14 @@ public class Glin {
     public <T> T create(Class<T> klass, Object tag) {
         return (T) Proxy.newProxyInstance(klass.getClassLoader(),
                 new Class<?>[] {klass}, new Handler(tag));
+    }
+
+    public void cancel(String tag) {
+        mClient.cancel(tag);
+    }
+
+    public void regist(Class<? extends Annotation> key, Class<? extends Call> value) {
+        mCallMapping.regist(key, value);
     }
 
     class Handler implements InvocationHandler {

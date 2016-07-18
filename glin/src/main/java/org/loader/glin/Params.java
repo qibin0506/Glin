@@ -30,7 +30,7 @@ public class Params {
         if(key == null) { return this;}
         if(value == null) { mParams.put(key, null);}
         else if(value instanceof File) { mFiles.put(key, (File) value);}
-        else mParams.put(key, value.toString());
+        else { mParams.put(key, value.toString());}
         return this;
     }
 
