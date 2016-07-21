@@ -17,7 +17,7 @@ public class JsonCall<T> extends Call<T> {
     @Override
     public void enqueue(final Callback<T> callback) {
         String json = mParams.getParams(Params.DEFAULT_JSON_KEY);
-        if(json == null) {
+        if (json == null) {
             throw new UnsupportedOperationException("cannot find json");
         }
         mClient.post(mUrl, mParams.getParams(Params.DEFAULT_JSON_KEY), mTag, callback);

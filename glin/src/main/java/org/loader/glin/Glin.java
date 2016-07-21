@@ -37,9 +37,9 @@ import org.loader.glin.annotation.Arg;
 import org.loader.glin.annotation.JSON;
 import org.loader.glin.annotation.POST;
 import org.loader.glin.call.Call;
-import org.loader.glin.call.CallMapping;
+import org.loader.glin.factory.CallFactory;
 import org.loader.glin.client.IClient;
-import org.loader.glin.parser.ParserFactory;
+import org.loader.glin.factory.ParserFactory;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -49,6 +49,8 @@ import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import javax.swing.plaf.TextUI;
+
 /**
  * Created by qibin on 2016/7/13.
  */
@@ -56,12 +58,12 @@ import java.util.Iterator;
 public class Glin {
     private IClient mClient;
     private String mBaseUrl;
-    private CallMapping mCallMapping;
+    private CallFactory mCallFactory;
 
     private Glin(IClient client, String baseUrl) {
         mClient = client;
         mBaseUrl = baseUrl;
-        mCallMapping = new CallMapping();
+        mCallFactory = new CallFactory();
     }
 
     @SuppressWarnings("unchecked")
@@ -75,7 +77,7 @@ public class Glin {
     }
 
     public void regist(Class<? extends Annotation> key, Class<? extends Call> value) {
-        mCallMapping.regist(key, value);
+        mCallFactory.regist(key, value);
     }
 
     class Handler implements InvocationHandler {
@@ -87,26 +89,26 @@ public class Glin {
 
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            String url = mBaseUrl == null ? "" : mBaseUrl;
             Class<? extends Annotation> key = null;
+            String path = null;
 
             if (method.isAnnotationPresent(JSON.class)) {
                 if(!method.isAnnotationPresent(POST.class)) {
                     throw new UnsupportedOperationException("cannot find POST annotation");
                 }
                 key = JSON.class;
-                url += method.getAnnotation(POST.class).value();
+                path = method.getAnnotation(POST.class).value();
             } else {
-                HashMap<Class<? extends Annotation>, Class<? extends Call>> mapping = mCallMapping.get();
+                HashMap<Class<? extends Annotation>, Class<? extends Call>> mapping = mCallFactory.get();
                 Class<? extends Annotation> item;
                 Annotation anno;
-                for(Iterator<Class<? extends Annotation>> iterator = mapping.keySet().iterator();
+                for (Iterator<Class<? extends Annotation>> iterator = mapping.keySet().iterator();
                     iterator.hasNext();) {
                     item = iterator.next();
                     if (method.isAnnotationPresent(item)) {
                         key = item;
                         anno = method.getAnnotation(item);
-                        url += (String) anno.getClass().getDeclaredMethod("value").invoke(anno);
+                        path = (String) anno.getClass().getDeclaredMethod("value").invoke(anno);
                         break;
                     }
                 }
@@ -116,18 +118,29 @@ public class Glin {
                 throw new UnsupportedOperationException("cannot find annotations");
             }
 
-            Class<? extends Call> callKlass = mCallMapping.get(key);
+            Class<? extends Call> callKlass = mCallFactory.get(key);
             if (callKlass == null) {
                 throw new UnsupportedOperationException("cannot find calls");
             }
 
             Constructor<? extends Call> constructor = callKlass.getConstructor(IClient.class, String.class, Params.class, Object.class);
-            Call<?> call = constructor.newInstance(mClient, url, params(method, args), mTag);
-            if (call == null) {
-                throw new UnsupportedOperationException("cannot find calls");
-            }
-
+            Call<?> call = constructor.newInstance(mClient, justUrl(path), params(method, args), mTag);
             return call;
+        }
+
+        private String justUrl(String path) {
+            String url = mBaseUrl == null ? "" : mBaseUrl;
+            path = path == null ? "" : path;
+            if (isFullUrl(path)) { url = path;}
+            else { url += path;}
+            return url;
+        }
+
+        private boolean isFullUrl(String url) {
+            if (url == null || url.length() == 0) { return false;}
+            if (url.toLowerCase().startsWith("http://")) { return true;}
+            if (url.toLowerCase().startsWith("https://")) {return true;}
+            return false;
         }
 
         private Params params(Method method, Object[] args) {
@@ -186,7 +199,7 @@ public class Glin {
             if (mClient == null) {
                 throw new UnsupportedOperationException("invoke client method first");
             }
-
+            mClient.timeout(ms);
             return this;
         }
 

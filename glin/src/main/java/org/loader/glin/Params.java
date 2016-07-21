@@ -27,9 +27,9 @@ public class Params {
     }
 
     public Params add(String key, Object value) {
-        if(key == null) { return this;}
-        if(value == null) { mParams.put(key, null);}
-        else if(value instanceof File) { mFiles.put(key, (File) value);}
+        if (key == null) { return this;}
+        if (value == null) { mParams.put(key, null);}
+        else if (value instanceof File) { mFiles.put(key, (File) value);}
         else { mParams.put(key, value.toString());}
         return this;
     }
@@ -51,14 +51,14 @@ public class Params {
     }
 
     public void remove(String key) {
-        if(mParams.containsKey(key)) { mParams.remove(key);}
-        if(mFiles.containsKey(key)) { mFiles.remove(key);}
+        if (mParams.containsKey(key)) { mParams.remove(key);}
+        if (mFiles.containsKey(key)) { mFiles.remove(key);}
     }
 
     public String encode() {
         String query = null;
-        for(Map.Entry<String, String> entry : mParams.entrySet()) {
-            if(query == null) { query = entry.getKey() + "=" + entry.getValue();}
+        for (Map.Entry<String, String> entry : mParams.entrySet()) {
+            if (query == null) { query = entry.getKey() + "=" + entry.getValue();}
             else { query += "&" + entry.getKey() + "=" + entry.getValue();}
         }
 
