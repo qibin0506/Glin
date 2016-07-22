@@ -92,27 +92,41 @@ public class Glin {
             Class<? extends Annotation> key = null;
             String path = null;
 
-            if (method.isAnnotationPresent(JSON.class)) {
-                if(!method.isAnnotationPresent(POST.class)) {
-                    throw new UnsupportedOperationException("cannot find POST annotation");
-                }
-                key = JSON.class;
-                path = method.getAnnotation(POST.class).value();
-            } else {
-                HashMap<Class<? extends Annotation>, Class<? extends Call>> mapping = mCallFactory.get();
-                Class<? extends Annotation> item;
-                Annotation anno;
-                for (Iterator<Class<? extends Annotation>> iterator = mapping.keySet().iterator();
-                    iterator.hasNext();) {
-                    item = iterator.next();
-                    if (method.isAnnotationPresent(item)) {
-                        key = item;
-                        anno = method.getAnnotation(item);
-                        path = (String) anno.getClass().getDeclaredMethod("value").invoke(anno);
-                        break;
-                    }
+            HashMap<Class<? extends Annotation>, Class<? extends Call>> mapping = mCallFactory.get();
+            Class<? extends Annotation> item;
+            Annotation anno;
+            for (Iterator<Class<? extends Annotation>> iterator = mapping.keySet().iterator();
+                 iterator.hasNext();) {
+                item = iterator.next();
+                if (method.isAnnotationPresent(item)) {
+                    key = item;
+                    anno = method.getAnnotation(item);
+                    path = (String) anno.getClass().getDeclaredMethod("value").invoke(anno);
+                    break;
                 }
             }
+
+//            if (method.isAnnotationPresent(JSON.class)) {
+//                if(!method.isAnnotationPresent(POST.class)) {
+//                    throw new UnsupportedOperationException("cannot find POST annotation");
+//                }
+//                key = JSON.class;
+//                path = method.getAnnotation(POST.class).value();
+//            } else {
+//                HashMap<Class<? extends Annotation>, Class<? extends Call>> mapping = mCallFactory.get();
+//                Class<? extends Annotation> item;
+//                Annotation anno;
+//                for (Iterator<Class<? extends Annotation>> iterator = mapping.keySet().iterator();
+//                    iterator.hasNext();) {
+//                    item = iterator.next();
+//                    if (method.isAnnotationPresent(item)) {
+//                        key = item;
+//                        anno = method.getAnnotation(item);
+//                        path = (String) anno.getClass().getDeclaredMethod("value").invoke(anno);
+//                        break;
+//                    }
+//                }
+//            }
 
             if (key == null) {
                 throw new UnsupportedOperationException("cannot find annotations");
@@ -145,24 +159,22 @@ public class Glin {
 
         private Params params(Method method, Object[] args) {
             Params params = new Params();
-
+            System.out.println(method.getParameterAnnotations().length);
             if (args == null || args.length == 0) {
                 return params;
             }
 
+            // method.getParameterAnnotations.length always equals args.length
+            Annotation[][] paramsAnno = method.getParameterAnnotations();
             if (method.isAnnotationPresent(JSON.class)) {
                 params.add(Params.DEFAULT_JSON_KEY, args[0]);
                 return params;
             }
 
-            Annotation[][] paramsAnno = method.getParameterAnnotations();
-            if (paramsAnno.length != args.length) {
-                throw new UnsupportedOperationException("args must be annotated");
-            }
-
             int length = paramsAnno.length;
             for (int i = 0; i < length; i++) {
-                params.add(((Arg)paramsAnno[i][0]).value(), args[i]);
+                if (paramsAnno[i].length == 0) { params.add(Params.DEFAULT_JSON_KEY, args[i]);}
+                else { params.add(((Arg)paramsAnno[i][0]).value(), args[i]);}
             }
 
             return params;
