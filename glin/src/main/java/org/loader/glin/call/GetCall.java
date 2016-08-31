@@ -18,6 +18,6 @@ public class GetCall<T> extends Call<T> {
     public void enqueue(final Callback<T> callback) {
         String query = mParams.encode();
         String url =  query == null ? mUrl : mUrl + "?" + mParams.encode();
-        mClient.get(url, mTag, callback);
+        mClient.get(url, mHeaders, mTag, callback);
     }
 }

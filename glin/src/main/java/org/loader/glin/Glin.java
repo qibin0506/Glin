@@ -35,10 +35,12 @@ package org.loader.glin;
 
 import org.loader.glin.annotation.Arg;
 import org.loader.glin.annotation.JSON;
+import org.loader.glin.annotation.POST;
 import org.loader.glin.call.Call;
-import org.loader.glin.client.IClient;
 import org.loader.glin.factory.CallFactory;
+import org.loader.glin.client.IClient;
 import org.loader.glin.factory.ParserFactory;
+import org.loader.glin.interceptor.IResultInterceptor;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -47,6 +49,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Iterator;
+
+import javax.swing.plaf.TextUI;
 
 /**
  * Created by qibin on 2016/7/13.
@@ -156,7 +160,6 @@ public class Glin {
 
         private Params params(Method method, Object[] args) {
             Params params = new Params();
-            System.out.println(method.getParameterAnnotations().length);
             if (args == null || args.length == 0) {
                 return params;
             }
@@ -209,6 +212,14 @@ public class Glin {
                 throw new UnsupportedOperationException("invoke client method first");
             }
             mClient.timeout(ms);
+            return this;
+        }
+
+        public Builder resultInterceptor(IResultInterceptor interceptor) {
+            if (mClient == null) {
+                throw new UnsupportedOperationException("invoke client method first");
+            }
+            mClient.resultInterceptor(interceptor);
             return this;
         }
 

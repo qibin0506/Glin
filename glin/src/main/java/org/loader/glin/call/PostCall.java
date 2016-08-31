@@ -16,6 +16,6 @@ public class PostCall<T> extends Call<T> {
 
     @Override
     public void enqueue(final Callback<T> callback) {
-        mClient.post(mUrl, mParams, mTag, callback);
+        mClient.post(mUrl, mHeaders, mParams, mTag, callback);
     }
 }

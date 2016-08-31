@@ -16,6 +16,6 @@ public class PutCall<T> extends Call<T> {
 
     @Override
     public void enqueue(Callback<T> callback) {
-        mClient.put(mUrl, mParams, mTag, callback);
+        mClient.put(mUrl, mHeaders, mParams, mTag, callback);
     }
 }

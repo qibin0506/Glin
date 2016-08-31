@@ -20,6 +20,6 @@ public class JsonCall<T> extends Call<T> {
         if (json == null) {
             throw new UnsupportedOperationException("cannot find json");
         }
-        mClient.post(mUrl, mParams.getParams(Params.DEFAULT_JSON_KEY), mTag, callback);
+        mClient.post(mUrl, mHeaders, mParams.getParams(Params.DEFAULT_JSON_KEY), mTag, callback);
     }
 }

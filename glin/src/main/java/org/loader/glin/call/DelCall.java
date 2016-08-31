@@ -16,6 +16,6 @@ public class DelCall<T> extends Call<T> {
 
     @Override
     public void enqueue(Callback<T> callback) {
-        mClient.delete(mUrl, mTag, callback);
+        mClient.delete(mUrl, mHeaders, mTag, callback);
     }
 }

@@ -17,7 +17,7 @@ Glin glin = new Glin.Builder()
 
 #### create an interface
 ``` java
- public interface UserBiz {
+ public interface UserApi {
       @POST("/users/list")
       Call<User> list(@Arg("name") String userName);
   }
@@ -25,8 +25,8 @@ Glin glin = new Glin.Builder()
 
 #### request the network and callback
 ``` java
- UserBiz biz = glin.create(UserBiz.class, getClass().getName());
- Call<User> call = biz.list("qibin");
+ UserApi api = glin.create(UserApi.class, getClass().getName());
+ Call<User> call = api.list("qibin");
   call.enqueue(new Callback<User>() {
       @Override
       public void onResponse(Result<User> result) {
