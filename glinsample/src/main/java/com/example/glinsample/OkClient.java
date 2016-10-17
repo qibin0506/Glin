@@ -1,4 +1,4 @@
-package com.haiersmart.sfnation.net;
+package com.haiersmart.commonbizlib.net;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import org.loader.glin.Callback;
+import org.loader.glin.NetResult;
 import org.loader.glin.Params;
 import org.loader.glin.Result;
 import org.loader.glin.client.IClient;
@@ -209,15 +210,26 @@ public class OkClient implements IClient {
                 prntInfo("Error->" + e.getMessage());
                 Result<T> result = new Result<>();
                 result.ok(false);
+                result.setObj(0);
                 result.setMessage(e.getMessage());
                 callback(call, callback, result);
             }
 
             @Override
             public void onResponse(final Call call, Response response) throws IOException {
+                if (!response.isSuccessful()) {
+                    prntInfo("Response->" + response.code() + ":" + response.message());
+                    Result<T> res = new Result<>();
+                    res.ok(false);
+                    res.setObj(response.code());
+                    res.setMessage("");
+                    callback(call, callback, res);
+                    return;
+                }
                 String resp = response.body().string();
                 prntInfo("Response->" + replaceBlank(resp));
-                Result<T> res = (Result<T>) getParser(callback.getClass()).parse(callback.getClass(), resp);
+                NetResult netResult = new NetResult(response.code(), response.message(), resp);
+                Result<T> res = (Result<T>) getParser(callback.getClass()).parse(callback.getClass(), netResult);
                 callback(call, callback, res);
             }
         });
@@ -234,7 +246,7 @@ public class OkClient implements IClient {
 
     private <T> Parser getParser(Class<T> klass) {
         Class<?> type = Helper.getType(klass);
-        if (type.isAssignableFrom(List.class)) {
+        if (List.class.isAssignableFrom(type)) {
             return mParserFactory.getListParser();
         }
         return mParserFactory.getParser();

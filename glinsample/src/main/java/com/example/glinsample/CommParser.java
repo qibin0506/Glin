@@ -1,7 +1,6 @@
 package com.haiersmart.commonbizlib.parser;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import org.loader.glin.NetResult;
@@ -10,13 +9,13 @@ import org.loader.glin.helper.Helper;
 import org.loader.glin.parser.Parser;
 
 /**
- * Created by qibin on 2016/7/13. <br />
- * 解析json数组到List
+ * Created by qibin on 2016/7/19. <br />
+ * 解析json对象到java bean
  */
 
-public class ListParser extends Parser {
+public class CommParser extends Parser {
 
-    public ListParser(String key) {
+    public CommParser(String key) {
         super(key);
     }
 
@@ -33,17 +32,15 @@ public class ListParser extends Parser {
             result.ok(baseObject.getBooleanValue("ok"));
             if (result.isOK()) { // ok true
                 if (baseObject.containsKey(mKey)) {
-                    klass = Helper.getDeepType(klass);
-                    JSONArray arr = baseObject.getJSONArray(mKey);
-                    T t = (T) baseObject.parseArray(arr.toString(), klass);
+                    klass = Helper.getType(klass);
+                    T t = baseObject.getObject(mKey, klass);
                     result.setResult(t);
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
-            result.setMessage("数据获取失败");
+            result.setMessage("error parse");
         }
-
         return result;
     }
 }

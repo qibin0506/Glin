@@ -35,10 +35,9 @@ package org.loader.glin;
 
 import org.loader.glin.annotation.Arg;
 import org.loader.glin.annotation.JSON;
-import org.loader.glin.annotation.POST;
 import org.loader.glin.call.Call;
-import org.loader.glin.factory.CallFactory;
 import org.loader.glin.client.IClient;
+import org.loader.glin.factory.CallFactory;
 import org.loader.glin.factory.ParserFactory;
 import org.loader.glin.interceptor.IResultInterceptor;
 
@@ -49,8 +48,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Iterator;
-
-import javax.swing.plaf.TextUI;
 
 /**
  * Created by qibin on 2016/7/13.

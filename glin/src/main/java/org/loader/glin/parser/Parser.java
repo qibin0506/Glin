@@ -1,5 +1,6 @@
 package org.loader.glin.parser;
 
+import org.loader.glin.NetResult;
 import org.loader.glin.Result;
 
 /**
@@ -17,5 +18,12 @@ public abstract class Parser {
         mKey = key;
     }
 
-    public abstract <T> Result<T> parse(Class<T> klass, String response);
+    /**
+     *
+     * @param klass the class of {@code Callback}
+     * @param netResult
+     * @param <T>
+     * @return
+     */
+    public abstract <T> Result<T> parse(Class<T> klass, NetResult netResult);
 }

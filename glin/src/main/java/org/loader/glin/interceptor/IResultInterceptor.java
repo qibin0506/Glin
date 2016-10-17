@@ -9,7 +9,7 @@ import org.loader.glin.Result;
 
 public interface IResultInterceptor {
     /**
-     * 是否拦截结果，
+     * 是否拦截结果
      * @param result
      * @return true callback不会执行
      */

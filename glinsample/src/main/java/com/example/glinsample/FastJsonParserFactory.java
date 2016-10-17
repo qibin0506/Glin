@@ -11,7 +11,7 @@ public class FastJsonParserFactory implements ParserFactory {
 
     @Override
     public Parser getParser() {
-        return new com.example.glinsample.Parser("data");
+        return new CommParser("data");
     }
 
     @Override
