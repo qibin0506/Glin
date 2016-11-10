@@ -2,6 +2,7 @@ package org.loader.glin.client;
 
 import org.loader.glin.Callback;
 import org.loader.glin.Params;
+import org.loader.glin.annotation.ShouldCache;
 
 import java.util.LinkedHashMap;
 
@@ -10,10 +11,21 @@ import java.util.LinkedHashMap;
  */
 
 public interface IRequest {
-    <T> void get(final String url, final LinkedHashMap<String, String> header, final Object tag, final Callback<T> callback);
-    <T> void post(final String url, final LinkedHashMap<String, String> header, final Params params, final Object tag, final Callback<T> callback);
-    <T> void post(final String url, final LinkedHashMap<String, String> header, final String json, final Object tag, final Callback<T> callback);
-    <T> void put(final String url, final LinkedHashMap<String, String> header, final Params params, final Object tag, final Callback<T> callback);
-    <T> void put(final String url, final LinkedHashMap<String, String> header, final String json, final Object tag, final Callback<T> callback);
-    <T> void delete(final String url, final LinkedHashMap<String, String> header, final Object tag, final Callback<T> callback);
+    <T> void get(final String url, final LinkedHashMap<String, String> header, final Object tag,
+                 final boolean shouldCache, final Callback<T> callback);
+
+    <T> void post(final String url, final LinkedHashMap<String, String> header, final Params params,
+                  final Object tag, final boolean shouldCache, final Callback<T> callback);
+
+    <T> void post(final String url, final LinkedHashMap<String, String> header, final String json,
+                  final Object tag, final boolean shouldCache, final Callback<T> callback);
+
+    <T> void put(final String url, final LinkedHashMap<String, String> header, final Params params,
+                 final Object tag, final boolean shouldCache, final Callback<T> callback);
+
+    <T> void put(final String url, final LinkedHashMap<String, String> header, final String json,
+                 final Object tag, final boolean shouldCache, final Callback<T> callback);
+
+    <T> void delete(final String url, final LinkedHashMap<String, String> header,
+                    final Object tag, final boolean shouldCache, final Callback<T> callback);
 }

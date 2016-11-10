@@ -10,12 +10,12 @@ import org.loader.glin.client.IClient;
 
 public class PutCall<T> extends Call<T> {
 
-    public PutCall(IClient client, String url, Params params, Object tag) {
-        super(client, url, params, tag);
+    public PutCall(IClient client, String url, Params params, Object tag, boolean cache) {
+        super(client, url, params, tag, cache);
     }
 
     @Override
     public void enqueue(Callback<T> callback) {
-        mClient.put(mUrl, mHeaders, mParams, mTag, callback);
+        mClient.put(mUrl, mHeaders, mParams, mTag, shouldCache, callback);
     }
 }

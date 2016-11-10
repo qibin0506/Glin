@@ -10,12 +10,12 @@ import org.loader.glin.client.IClient;
 
 public class DelCall<T> extends Call<T> {
 
-    public DelCall(IClient client, String url, Params params, Object tag) {
-        super(client, url, params, tag);
+    public DelCall(IClient client, String url, Params params, Object tag, boolean cache) {
+        super(client, url, params, tag, cache);
     }
 
     @Override
     public void enqueue(Callback<T> callback) {
-        mClient.delete(mUrl, mHeaders, mTag, callback);
+        mClient.delete(mUrl, mHeaders, mTag, shouldCache, callback);
     }
 }

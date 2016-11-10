@@ -12,8 +12,9 @@ import java.util.LinkedHashMap;
 public interface IClient extends IRequest {
     void cancel(final Object tag);
     void parserFactory(ParserFactory factory);
-    void timeout(long ms);
-    void debugMode(boolean debug);
     LinkedHashMap<String, String> headers();
     void resultInterceptor(IResultInterceptor interceptor);
+    void cacheDir(String dir);
+    void timeout(long ms);
+    void debugMode(boolean debug);
 }

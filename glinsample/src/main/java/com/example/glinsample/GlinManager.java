@@ -21,6 +21,7 @@ public class GlinManager {
             .baseUrl("http://192.168.201.39")
             .debug(true)
             .parserFactory(new FastJsonParserFactory())
+            .cacheDir(Environment.getExternalStorageDirectory() + "/glin_cache/")
             .timeout(10000)
             .build();
     }

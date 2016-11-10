@@ -1,4 +1,4 @@
-package com.haiersmart.commonbizlib.net;
+package org.loader.superglin;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -12,17 +12,20 @@ import org.loader.glin.Result;
 import org.loader.glin.client.IClient;
 import org.loader.glin.factory.ParserFactory;
 import org.loader.glin.helper.Helper;
+import org.loader.glin.helper.SerializeHelper;
 import org.loader.glin.interceptor.IResultInterceptor;
 import org.loader.glin.parser.Parser;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -47,6 +50,7 @@ import okhttp3.Response;
  */
 
 public class OkClient implements IClient {
+    public static final String MSG_ERROR_HTTP = "msg_error_http:okhttp";
     private static final long DEFAULT_TIME_OUT = 5000;
 
     private OkHttpClient mClient;
@@ -56,6 +60,7 @@ public class OkClient implements IClient {
 
     private long mTimeOut = DEFAULT_TIME_OUT;
     private boolean isDebug;
+    private String mCacheDir;
 
     public OkClient() {
         mClient = buildClient();
@@ -96,46 +101,52 @@ public class OkClient implements IClient {
     }
 
     @Override
-    public <T> void get(String url, final LinkedHashMap<String, String> header, Object tag, Callback<T> callback) {
+    public <T> void get(String url, final LinkedHashMap<String, String> header,
+                        Object tag, boolean shouldCache, Callback<T> callback) {
         final Request request = new Request.Builder().url(url).build();
-        call(request,header, callback, tag, new StringBuilder());
+        call(request, header, null, callback, tag, shouldCache, new StringBuilder());
     }
 
     @Override
-    public <T> void post(String url, final LinkedHashMap<String, String> header, Params params, Object tag, Callback<T> callback) {
+    public <T> void post(String url, final LinkedHashMap<String, String> header,
+                         Params params, Object tag, boolean shouldCache, Callback<T> callback) {
         StringBuilder debugInfo = new StringBuilder();
         MultipartBody builder = createRequestBody(params, debugInfo);
         Request request = new Request.Builder().url(url).post(builder).build();
-        call(request,header, callback, tag, debugInfo);
+        call(request, header, params.encode(), callback, tag, shouldCache, debugInfo);
     }
 
     @Override
-    public <T> void post(String url, final LinkedHashMap<String, String> header, String json, Object tag, final Callback<T> callback) {
+    public <T> void post(String url, final LinkedHashMap<String, String> header,
+                         String json, Object tag, boolean shouldCache, final Callback<T> callback) {
         StringBuilder debugInfo = new StringBuilder();
         Request request = new Request.Builder().url(url).post(createJsonBody(json, debugInfo)).build();
-        call(request,header, callback, tag, debugInfo);
+        call(request, header, json, callback, tag, shouldCache, debugInfo);
     }
 
     @Override
-    public <T> void put(String url, final LinkedHashMap<String, String> header, Params params, Object tag, Callback<T> callback) {
+    public <T> void put(String url, final LinkedHashMap<String, String> header,
+                        Params params, Object tag, boolean shouldCache, Callback<T> callback) {
         StringBuilder debugInfo = new StringBuilder();
         MultipartBody builder = createRequestBody(params, debugInfo);
         Request request = new Request.Builder().url(url).put(builder).build();
-        call(request,header, callback, tag, debugInfo);
+        call(request, header, params.encode(), callback, tag, shouldCache, debugInfo);
     }
 
     @Override
-    public <T> void put(String url, final LinkedHashMap<String, String> header, String json, Object tag, Callback<T> callback) {
+    public <T> void put(String url, final LinkedHashMap<String, String> header,
+                        String json, Object tag, boolean shouldCache, Callback<T> callback) {
         StringBuilder debugInfo = new StringBuilder();
         Request request = new Request.Builder().url(url).put(createJsonBody(json, debugInfo)).build();
-        call(request,header, callback, tag, debugInfo);
+        call(request, header, json, callback, tag, shouldCache, debugInfo);
     }
 
     @Override
-    public <T> void delete(String url, final LinkedHashMap<String, String> header, Object tag, Callback<T> callback) {
+    public <T> void delete(String url, final LinkedHashMap<String, String> header,
+                           Object tag, boolean shouldCache, Callback<T> callback) {
         StringBuilder debugInfo = new StringBuilder();
         final Request request = new Request.Builder().url(url).delete().build();
-        call(request,header, callback, tag, debugInfo);
+        call(request, header, null, callback, tag, shouldCache, debugInfo);
     }
 
     @Override
@@ -173,6 +184,16 @@ public class OkClient implements IClient {
         isDebug = debug;
     }
 
+    @Override
+    public void cacheDir(String dir) {
+        mCacheDir = dir;
+        if (mCacheDir != null && mCacheDir.length() != 0) {
+            if (!mCacheDir.endsWith("/")) {
+                mCacheDir = mCacheDir + "/";
+            }
+        }
+    }
+
     private OkHttpClient cloneClient() {
         return mClient.newBuilder()
                 .connectTimeout(mTimeOut, TimeUnit.MILLISECONDS)
@@ -181,9 +202,23 @@ public class OkClient implements IClient {
                 .build();
     }
 
+    @SuppressWarnings("unchecked")
     private <T> void call(Request request, final LinkedHashMap<String, String> header,
-                          final Callback<T> callback,
-                          final Object tag, StringBuilder debugInfo) {
+                          final String params, final Callback<T> callback, final Object tag,
+                          final boolean shouldCache, StringBuilder debugInfo) {
+
+        final String cacheName = request.url().toString() + (params == null ? "" : params);
+        T t = SerializeHelper.unSerialize(mCacheDir, cacheName);
+        if (t != null) {
+            prntInfo("ReadCache->" + cacheName);
+            Result<T> res = new Result<>();
+            res.setOk(true);
+            res.setMessage("");
+            res.setResult(t);
+            res.setObj(200);
+            callback.onResponse(res);
+        }
+
         String info = debugInfo.toString();
         debugInfo.delete(0, debugInfo.length());
 
@@ -211,7 +246,7 @@ public class OkClient implements IClient {
                 Result<T> result = new Result<>();
                 result.ok(false);
                 result.setObj(0);
-                result.setMessage(e.getMessage());
+                result.setMessage(MSG_ERROR_HTTP);
                 callback(call, callback, result);
             }
 
@@ -222,14 +257,20 @@ public class OkClient implements IClient {
                     Result<T> res = new Result<>();
                     res.ok(false);
                     res.setObj(response.code());
-                    res.setMessage("");
+                    res.setMessage(MSG_ERROR_HTTP);
                     callback(call, callback, res);
                     return;
                 }
+
                 String resp = response.body().string();
                 prntInfo("Response->" + replaceBlank(resp));
                 NetResult netResult = new NetResult(response.code(), response.message(), resp);
                 Result<T> res = (Result<T>) getParser(callback.getClass()).parse(callback.getClass(), netResult);
+
+                if (shouldCache && res.getResult() != null) {
+                    prntInfo("CacheResult->" + cacheName);
+                    SerializeHelper.serialize(mCacheDir, cacheName, res.getResult());
+                }
                 callback(call, callback, res);
             }
         });

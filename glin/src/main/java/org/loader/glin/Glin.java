@@ -35,6 +35,7 @@ package org.loader.glin;
 
 import org.loader.glin.annotation.Arg;
 import org.loader.glin.annotation.JSON;
+import org.loader.glin.annotation.ShouldCache;
 import org.loader.glin.call.Call;
 import org.loader.glin.client.IClient;
 import org.loader.glin.factory.CallFactory;
@@ -135,8 +136,11 @@ public class Glin {
                 throw new UnsupportedOperationException("cannot find calls");
             }
 
-            Constructor<? extends Call> constructor = callKlass.getConstructor(IClient.class, String.class, Params.class, Object.class);
-            Call<?> call = constructor.newInstance(mClient, justUrl(path), params(method, args), mTag);
+            boolean shouldCache = method.isAnnotationPresent(ShouldCache.class);
+            Constructor<? extends Call> constructor = callKlass.getConstructor(IClient.class, String.class,
+                    Params.class, Object.class, boolean.class);
+            Call<?> call = constructor.newInstance(mClient, justUrl(path),
+                    params(method, args), mTag, shouldCache);
             return call;
         }
 
@@ -201,6 +205,14 @@ public class Glin {
                 throw new UnsupportedOperationException("invoke client method first");
             }
             mClient.parserFactory(factory);
+            return this;
+        }
+
+        public Builder cacheDir(String dir) {
+            if (mClient == null) {
+                throw new UnsupportedOperationException("invoke client method first");
+            }
+            mClient.cacheDir(dir);
             return this;
         }
 

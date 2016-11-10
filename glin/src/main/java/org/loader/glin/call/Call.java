@@ -15,13 +15,15 @@ public abstract class Call<T> {
     protected Params mParams;
     protected IClient mClient;
     protected Object mTag;
+    protected boolean shouldCache;
     protected LinkedHashMap<String, String> mHeaders;
 
-    public Call(IClient client, String url, Params params, Object tag) {
+    public Call(IClient client, String url, Params params, Object tag, boolean cache) {
         mClient = client;
         mUrl = url;
         mParams = params;
         mTag = tag;
+        shouldCache = cache;
     }
 
     public Call<T> header(LinkedHashMap<String, String> headers) {

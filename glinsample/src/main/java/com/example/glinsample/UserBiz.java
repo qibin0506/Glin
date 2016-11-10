@@ -10,6 +10,7 @@ import org.loader.glin.call.Call;
  */
 
 public interface UserBiz {
+	@ShouldCache
     @POST("/users/list")
     Call<User> list(@Arg("name") String userName);
 }

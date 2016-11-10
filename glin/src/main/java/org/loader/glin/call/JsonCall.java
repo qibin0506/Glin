@@ -10,8 +10,8 @@ import org.loader.glin.client.IClient;
 
 public class JsonCall<T> extends Call<T> {
 
-    public JsonCall(IClient client, String url, Params params, Object tag) {
-        super(client, url, params, tag);
+    public JsonCall(IClient client, String url, Params params, Object tag, boolean cache) {
+        super(client, url, params, tag, cache);
     }
 
     @Override
@@ -20,6 +20,6 @@ public class JsonCall<T> extends Call<T> {
         if (json == null) {
             throw new UnsupportedOperationException("cannot find json");
         }
-        mClient.post(mUrl, mHeaders, mParams.getParams(Params.DEFAULT_JSON_KEY), mTag, callback);
+        mClient.post(mUrl, mHeaders, mParams.getParams(Params.DEFAULT_JSON_KEY), mTag, shouldCache, callback);
     }
 }

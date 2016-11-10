@@ -2,6 +2,7 @@ package org.loader.glin.call;
 
 import org.loader.glin.Callback;
 import org.loader.glin.Params;
+import org.loader.glin.annotation.ShouldCache;
 import org.loader.glin.client.IClient;
 
 /**
@@ -10,14 +11,20 @@ import org.loader.glin.client.IClient;
 
 public class GetCall<T> extends Call<T> {
 
-    public GetCall(IClient client, String url, Params params, Object tag) {
-        super(client, url, params, tag);
+    public GetCall(IClient client, String url, Params params, Object tag, boolean cache) {
+        super(client, url, params, tag, cache);
     }
 
     @Override
     public void enqueue(final Callback<T> callback) {
         String query = mParams.encode();
-        String url =  query == null ? mUrl : mUrl + "?" + mParams.encode();
-        mClient.get(url, mHeaders, mTag, callback);
+
+        String url = mUrl;
+        if (query != null) {
+            if (url.contains("?")) { url = url + "&" + query;}
+            else { url = url + "?" + query;}
+        }
+
+        mClient.get(url, mHeaders, mTag, shouldCache, callback);
     }
 }
