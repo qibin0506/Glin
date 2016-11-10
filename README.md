@@ -8,16 +8,20 @@ Glin, A retrofit like network framework
 ``` java
 Glin glin = new Glin.Builder()
     .client(new OkClient())
-    .baseUrl("http://192.168.201.39")
-    .debug(true)
-    .parserFactory(new FastJsonParserFactory())
-    .timeout(10000)
+    .baseUrl("http://192.168.201.39") // 基础url
+    .debug(true) // 是否开启debug模式
+    .parserFactory(new FastJsonParserFactory()) // 数据解析
+    .cacheDir(Environment.getExternalStorageDirectory() + "/glin_cache/") // 数据缓存目录
+    .timeout(10000) // 设置超时
     .build();
 ```
 
 #### create an interface
 ``` java
  public interface UserApi {
+      // 加入@ShouldCache的请求会将最新一次请求缓存早cacheDir中
+      // 缓存机制是按照url和请求参数共同决定的
+      @ShouldCache
       @POST("/users/list")
       Call<User> list(@Arg("name") String userName);
   }
