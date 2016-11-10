@@ -206,17 +206,19 @@ public class OkClient implements IClient {
     private <T> void call(Request request, final LinkedHashMap<String, String> header,
                           final String params, final Callback<T> callback, final Object tag,
                           final boolean shouldCache, StringBuilder debugInfo) {
-
         final String cacheName = request.url().toString() + (params == null ? "" : params);
-        T t = SerializeHelper.unSerialize(mCacheDir, cacheName);
-        if (t != null) {
-            prntInfo("ReadCache->" + cacheName);
-            Result<T> res = new Result<>();
-            res.setOk(true);
-            res.setMessage("");
-            res.setResult(t);
-            res.setObj(200);
-            callback.onResponse(res);
+
+        if (shouldCache) {
+            T t = SerializeHelper.unSerialize(mCacheDir, cacheName);
+            if (t != null) {
+                prntInfo("ReadCache->" + cacheName);
+                Result<T> res = new Result<>();
+                res.setOk(true);
+                res.setMessage("");
+                res.setResult(t);
+                res.setObj(200);
+                callback.onResponse(res);
+            }
         }
 
         String info = debugInfo.toString();
