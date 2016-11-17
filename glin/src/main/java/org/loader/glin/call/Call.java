@@ -31,5 +31,10 @@ public abstract class Call<T> {
         return this;
     }
 
+    public Call<T> shouldCache(boolean cache) {
+        shouldCache = cache;
+        return this;
+    }
+
     public abstract void enqueue(Callback<T> callback);
 }
