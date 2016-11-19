@@ -9,6 +9,7 @@ public class Result<T> {
     private String message;
     private T result;
     private Object obj;
+    private boolean isCache;
 
     public boolean isOK() {
         return ok;
@@ -54,6 +55,14 @@ public class Result<T> {
         return (V) getObj();
     }
 
+    public boolean isCache() {
+        return isCache;
+    }
+
+    public void setCache(boolean cache) {
+        isCache = cache;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -61,6 +70,7 @@ public class Result<T> {
         sb.append("message: ").append(message).append("\n");
         sb.append("obj: ").append(obj).append("\n");
         sb.append("result: ").append(result);
+        sb.append("is_cache: ").append(isCache);
 
         return sb.toString();
     }
