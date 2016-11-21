@@ -25,6 +25,7 @@ public class DefaultCacheProvider implements ICacheProvider {
     @Override
     public <T> Result<T> get(String key) {
         T cacheResult = SerializeHelper.unSerialize(mCachePath, key + SUFFIX);
+        if (cacheResult == null) { return null;}
 
         Result<T> result = new Result<>();
         result.setOk(true);
