@@ -7,10 +7,11 @@ public interface ICacheProvider {
     /**
      * get cache by key of {@link #getKey(String, String)}
      * @param key key
-     * @param  klass type of java bean
+     * @param  klass type of data struct, see also {@link org.loader.glin.helper.Helper}
+     * @param isList is result a List
      * @return cache data
      */
-    <T> Result<T> get(String key, Class<T> klass);
+    <T> Result<T> get(String key, Class<T> klass, boolean isList);
 
     /**
      * cache data

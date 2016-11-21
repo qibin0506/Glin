@@ -1,4 +1,4 @@
-package com.haiersmart.commonbizlib.parser;
+package org.loader.superglin;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -32,14 +32,13 @@ public class CommParser extends Parser {
             result.ok(baseObject.getBooleanValue("ok"));
             if (result.isOK()) { // ok true
                 if (baseObject.containsKey(mKey)) {
-                    klass = Helper.getType(klass);
                     T t = baseObject.getObject(mKey, klass);
                     result.setResult(t);
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
-            result.setMessage("error parse");
+            result.setMessage("数据获取失败");
         }
         return result;
     }

@@ -206,9 +206,21 @@ public class OkClient implements IClient {
         final String cacheKey = mCacheProvider == null ? null :
                 mCacheProvider.getKey(request.url().toString(), params);
 
+        final Class<?> callbackKlass = callback.getClass();
+        // data_struct.class or List.class
+        // Callback<List<String>>
+        final Class<T> dataKlass = Helper.getType(callbackKlass);
+        final boolean resultTypeIsArray = resultTypeIsArray(dataKlass);
         if (shouldCache && mCacheProvider != null) {
-            Result<T> result = mCacheProvider.get(cacheKey);
-            if (result != null) {
+            // data struct or List.class
+            Result<T> result;
+            if (resultTypeIsArray) {
+                Class<T> klass = Helper.getDeepType(callbackKlass);
+                result = mCacheProvider.get(cacheKey, klass, true);
+            }else {
+                result = mCacheProvider.get(cacheKey, dataKlass, false);
+            }
+            if (result != null && result.isOK()) {
                 callback.onResponse(result);
             }
         }
@@ -259,10 +271,20 @@ public class OkClient implements IClient {
                 String resp = response.body().string();
                 prntInfo("Response->" + replaceBlank(resp));
                 NetResult netResult = new NetResult(response.code(), response.message(), resp);
-                Result<T> res = (Result<T>) getParser(callback.getClass()).parse(callback.getClass(), netResult);
+
+                Result<T> res;
+                // if dataKlass == List.class
+                if (resultTypeIsArray) {
+                    // data_struct.class
+                    Class<T> klass = Helper.getDeepType(callbackKlass);
+                    res = mParserFactory.getListParser().parse(klass, netResult);
+                } else {
+                    res = mParserFactory.getParser().parse(dataKlass, netResult);
+                }
 
                 callback(call, callback, res);
-                if (shouldCache && mCacheProvider != null && res.getResult() != null) {
+                if (shouldCache && mCacheProvider != null
+                        && res.isOK() && res.getResult() != null) {
                     prntInfo("CacheResult->" + cacheKey);
                     mCacheProvider.put(cacheKey, netResult, res);
                 }
@@ -279,12 +301,11 @@ public class OkClient implements IClient {
         prntInfo(debugInfo.toString());
     }
 
-    private <T> Parser getParser(Class<T> klass) {
-        Class<?> type = Helper.getType(klass);
-        if (List.class.isAssignableFrom(type)) {
-            return mParserFactory.getListParser();
+    private <T> boolean resultTypeIsArray(Class<T> dataKlass) {
+        if (List.class.isAssignableFrom(dataKlass)) {
+            return true;
         }
-        return mParserFactory.getParser();
+        return false;
     }
 
     private static String replaceBlank(String str) {

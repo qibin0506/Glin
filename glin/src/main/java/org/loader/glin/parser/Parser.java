@@ -20,7 +20,7 @@ public abstract class Parser {
 
     /**
      *
-     * @param klass the class of {@code Callback}
+     * @param klass the class of data struct
      * @param netResult
      * @param <T>
      * @return
