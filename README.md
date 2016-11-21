@@ -11,7 +11,7 @@ Glin glin = new Glin.Builder()
     .baseUrl("http://192.168.201.39") // the basic url
     .debug(true) // debug mode
     .parserFactory(new FastJsonParserFactory()) // your parser factory
-    .cacheDir(Environment.getExternalStorageDirectory() + "/glin_cache/") // your cache dir
+    .cacheProvider(new DefaultCacheProvider(Environment.getExternalStorageDirectory() + "/test/", 2000)) // use default cacheProvider
     .timeout(10000) // timeout in ms
     .build();
 ```
