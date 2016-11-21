@@ -283,8 +283,7 @@ public class OkClient implements IClient {
                 }
 
                 callback(call, callback, res);
-                if (shouldCache && mCacheProvider != null
-                        && res.isOK() && res.getResult() != null) {
+                if (shouldCache && mCacheProvider != null && res.isOK()) {
                     prntInfo("CacheResult->" + cacheKey);
                     mCacheProvider.put(cacheKey, netResult, res);
                 }
