@@ -7,9 +7,10 @@ public interface ICacheProvider {
     /**
      * get cache by key of {@link #getKey(String, String)}
      * @param key key
+     * @param  klass type of java bean
      * @return cache data
      */
-    <T> Result<T> get(String key);
+    <T> Result<T> get(String key, Class<T> klass);
 
     /**
      * cache data
