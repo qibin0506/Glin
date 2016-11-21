@@ -23,8 +23,17 @@ public class DefaultCacheProvider implements ICacheProvider {
      * {@inheritDoc}
      */
     @Override
-    public <T> T get(String key) {
-        return SerializeHelper.unSerialize(mCachePath, key + SUFFIX);
+    public <T> Result<T> get(String key) {
+        T cacheResult = SerializeHelper.unSerialize(mCachePath, key + SUFFIX);
+
+        Result<T> result = new Result<>();
+        result.setOk(true);
+        result.setMessage("");
+        result.setResult(cacheResult);
+        result.setObj(200);
+        result.setCache(true);
+
+        return result;
     }
 
     /**

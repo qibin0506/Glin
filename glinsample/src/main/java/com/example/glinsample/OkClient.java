@@ -207,16 +207,9 @@ public class OkClient implements IClient {
                 mCacheProvider.getKey(request.url().toString(), params);
 
         if (shouldCache && mCacheProvider != null) {
-            T cacheResult = mCacheProvider.get(cacheKey);
-            if (cacheResult != null) {
-                prntInfo("ReadCache->" + cacheKey);
-                Result<T> res = new Result<>();
-                res.setOk(true);
-                res.setMessage("");
-                res.setResult(cacheResult);
-                res.setObj(200);
-                res.setCache(true);
-                callback.onResponse(res);
+            Result<T> result = mCacheProvider.get(cacheKey);
+            if (result != null) {
+                callback.onResponse(result);
             }
         }
 

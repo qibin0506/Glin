@@ -9,7 +9,7 @@ public interface ICacheProvider {
      * @param key key
      * @return cache data
      */
-    <T> T get(String key);
+    <T> Result<T> get(String key);
 
     /**
      * cache data
