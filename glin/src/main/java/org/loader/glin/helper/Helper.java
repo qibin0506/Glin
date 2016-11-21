@@ -2,6 +2,8 @@ package org.loader.glin.helper;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.math.BigInteger;
+import java.security.MessageDigest;
 
 /**
  * Created by qibin on 2016/7/13.
@@ -40,5 +42,17 @@ public class Helper {
         }
 
         return null;
+    }
+
+    public static String md5(String str) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            md.update(str.getBytes());
+            return new BigInteger(1, md.digest()).toString(16);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return str;
     }
 }

@@ -7,14 +7,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.math.BigInteger;
-import java.security.MessageDigest;
 
 public class SerializeHelper {
 
     public static <T> T unSerialize(String path, String name) {
         checkPath(path);
-        name = md5(name);
         ObjectInputStream ois = null;
         try {
             ois = new ObjectInputStream(new FileInputStream(path + name));
@@ -39,8 +36,6 @@ public class SerializeHelper {
     public static void serialize(String path, String name, Object obj) {
         checkPath(path);
         if (!(obj instanceof Serializable)) { return;}
-        name = md5(name);
-
         ObjectOutputStream oos = null;
         try {
             oos = new ObjectOutputStream(new FileOutputStream(path + name));
@@ -64,17 +59,5 @@ public class SerializeHelper {
         if (!pathFile.exists()) {
             pathFile.mkdirs();
         }
-    }
-
-    public static String md5(String str) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            md.update(str.getBytes());
-            return new BigInteger(1, md.digest()).toString(16);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return str;
     }
 }

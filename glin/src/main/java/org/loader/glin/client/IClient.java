@@ -1,5 +1,6 @@
 package org.loader.glin.client;
 
+import org.loader.glin.cache.ICacheProvider;
 import org.loader.glin.factory.ParserFactory;
 import org.loader.glin.interceptor.IResultInterceptor;
 
@@ -14,7 +15,7 @@ public interface IClient extends IRequest {
     void parserFactory(ParserFactory factory);
     LinkedHashMap<String, String> headers();
     void resultInterceptor(IResultInterceptor interceptor);
-    void cacheDir(String dir);
+    void cacheProvider(ICacheProvider provider);
     void timeout(long ms);
     void debugMode(boolean debug);
 }

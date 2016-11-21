@@ -9,6 +9,8 @@ import org.loader.glin.Callback;
 import org.loader.glin.NetResult;
 import org.loader.glin.Params;
 import org.loader.glin.Result;
+import org.loader.glin.cache.DefaultCacheProvider;
+import org.loader.glin.cache.ICacheProvider;
 import org.loader.glin.client.IClient;
 import org.loader.glin.factory.ParserFactory;
 import org.loader.glin.helper.Helper;
@@ -57,10 +59,10 @@ public class OkClient implements IClient {
     private Handler mHandler;
     private ParserFactory mParserFactory;
     private IResultInterceptor mResultInterceptor;
+    private ICacheProvider mCacheProvider;
 
     private long mTimeOut = DEFAULT_TIME_OUT;
     private boolean isDebug;
-    private String mCacheDir;
 
     public OkClient() {
         mClient = buildClient();
@@ -185,13 +187,8 @@ public class OkClient implements IClient {
     }
 
     @Override
-    public void cacheDir(String dir) {
-        mCacheDir = dir;
-        if (mCacheDir != null && mCacheDir.length() != 0) {
-            if (!mCacheDir.endsWith("/")) {
-                mCacheDir = mCacheDir + "/";
-            }
-        }
+    public void cacheProvider(ICacheProvider provider) {
+        mCacheProvider = provider;
     }
 
     private OkHttpClient cloneClient() {
@@ -206,17 +203,19 @@ public class OkClient implements IClient {
     private <T> void call(Request request, final LinkedHashMap<String, String> header,
                           final String params, final Callback<T> callback, final Object tag,
                           final boolean shouldCache, StringBuilder debugInfo) {
-        final String cacheName = request.url().toString() + (params == null ? "" : params);
+        final String cacheKey = mCacheProvider == null ? null :
+                mCacheProvider.getKey(request.url().toString(), params);
 
-        if (shouldCache) {
-            T t = SerializeHelper.unSerialize(mCacheDir, cacheName);
-            if (t != null) {
-                prntInfo("ReadCache->" + cacheName);
+        if (shouldCache && mCacheProvider != null) {
+            T cacheResult = mCacheProvider.get(cacheKey);
+            if (cacheResult != null) {
+                prntInfo("ReadCache->" + cacheKey);
                 Result<T> res = new Result<>();
                 res.setOk(true);
                 res.setMessage("");
-                res.setResult(t);
+                res.setResult(cacheResult);
                 res.setObj(200);
+                res.setCache(true);
                 callback.onResponse(res);
             }
         }
@@ -269,9 +268,9 @@ public class OkClient implements IClient {
                 NetResult netResult = new NetResult(response.code(), response.message(), resp);
                 Result<T> res = (Result<T>) getParser(callback.getClass()).parse(callback.getClass(), netResult);
 
-                if (shouldCache && res.getResult() != null) {
-                    prntInfo("CacheResult->" + cacheName);
-                    SerializeHelper.serialize(mCacheDir, cacheName, res.getResult());
+                if (shouldCache && mCacheProvider != null && res.getResult() != null) {
+                    prntInfo("CacheResult->" + cacheKey);
+                    mCacheProvider.put(cacheKey, netResult, res);
                 }
                 callback(call, callback, res);
             }

@@ -36,6 +36,7 @@ package org.loader.glin;
 import org.loader.glin.annotation.Arg;
 import org.loader.glin.annotation.JSON;
 import org.loader.glin.annotation.ShouldCache;
+import org.loader.glin.cache.ICacheProvider;
 import org.loader.glin.call.Call;
 import org.loader.glin.client.IClient;
 import org.loader.glin.factory.CallFactory;
@@ -208,11 +209,11 @@ public class Glin {
             return this;
         }
 
-        public Builder cacheDir(String dir) {
+        public Builder cacheProvider(ICacheProvider cacheProvider) {
             if (mClient == null) {
                 throw new UnsupportedOperationException("invoke client method first");
             }
-            mClient.cacheDir(dir);
+            mClient.cacheProvider(cacheProvider);
             return this;
         }
 
