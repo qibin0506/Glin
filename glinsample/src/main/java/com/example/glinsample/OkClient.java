@@ -166,39 +166,6 @@ public class OkClient implements IClient {
         }
     }
 
-    @Override
-    public LinkedHashMap<String, String> headers() {
-        return null;
-    }
-
-    @Override
-    public void parserFactory(ParserFactory factory) {
-        mParserFactory = factory;
-    }
-
-    @Override
-    public void timeout(long ms) {
-        mTimeOut = ms;
-    }
-
-    @Override
-    public void debugMode(boolean debug) {
-        isDebug = debug;
-    }
-
-    @Override
-    public void cacheProvider(ICacheProvider provider) {
-        mCacheProvider = provider;
-    }
-
-    private OkHttpClient cloneClient() {
-        return mClient.newBuilder()
-                .connectTimeout(mTimeOut, TimeUnit.MILLISECONDS)
-//                .readTimeout(mTimeOut, TimeUnit.MILLISECONDS)
-//                .writeTimeout(mTimeOut, TimeUnit.MILLISECONDS)
-                .build();
-    }
-
     @SuppressWarnings("unchecked")
     private <T> void call(Request request, final LinkedHashMap<String, String> header,
                           final String params, final Callback<T> callback, final Object tag,
@@ -295,7 +262,6 @@ public class OkClient implements IClient {
             debugInfo.append("Header->").append(debugHeader).append("\n");
         }
         debugInfo.append("\n");
-
         debugInfo.append(info);
         prntInfo(debugInfo.toString());
     }
@@ -393,6 +359,39 @@ public class OkClient implements IClient {
     private Handler getHandler() {
         if(mHandler == null) { mHandler = new Handler(Looper.getMainLooper());}
         return mHandler;
+    }
+
+    @Override
+    public LinkedHashMap<String, String> headers() {
+        return null;
+    }
+
+    @Override
+    public void parserFactory(ParserFactory factory) {
+        mParserFactory = factory;
+    }
+
+    @Override
+    public void timeout(long ms) {
+        mTimeOut = ms;
+    }
+
+    @Override
+    public void debugMode(boolean debug) {
+        isDebug = debug;
+    }
+
+    @Override
+    public void cacheProvider(ICacheProvider provider) {
+        mCacheProvider = provider;
+    }
+
+    private OkHttpClient cloneClient() {
+        return mClient.newBuilder()
+                .connectTimeout(mTimeOut, TimeUnit.MILLISECONDS)
+//                .readTimeout(mTimeOut, TimeUnit.MILLISECONDS)
+//                .writeTimeout(mTimeOut, TimeUnit.MILLISECONDS)
+                .build();
     }
 
     @Override
