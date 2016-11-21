@@ -268,11 +268,11 @@ public class OkClient implements IClient {
                 NetResult netResult = new NetResult(response.code(), response.message(), resp);
                 Result<T> res = (Result<T>) getParser(callback.getClass()).parse(callback.getClass(), netResult);
 
+                callback(call, callback, res);
                 if (shouldCache && mCacheProvider != null && res.getResult() != null) {
                     prntInfo("CacheResult->" + cacheKey);
                     mCacheProvider.put(cacheKey, netResult, res);
                 }
-                callback(call, callback, res);
             }
         });
 
