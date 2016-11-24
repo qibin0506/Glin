@@ -35,14 +35,6 @@ public class Result<T> {
         this.result = mResult;
     }
 
-    public boolean isOk() {
-        return ok;
-    }
-
-    public void setOk(boolean ok) {
-        this.ok = ok;
-    }
-
     public Object getObj() {
         return obj;
     }
