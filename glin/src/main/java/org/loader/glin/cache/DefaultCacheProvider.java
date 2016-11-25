@@ -28,7 +28,7 @@ public class DefaultCacheProvider implements ICacheProvider {
         if (cacheResult == null) { return null;}
 
         Result<T> result = new Result<>();
-        result.setOk(true);
+        result.ok(true);
         result.setMessage("");
         result.setResult(cacheResult);
         result.setObj(200);
