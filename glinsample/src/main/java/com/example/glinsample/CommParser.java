@@ -28,7 +28,8 @@ public class CommParser extends Parser {
                 result.setMessage(baseObject.getString("message"));// message always get
             }
 
-            result.setObj(baseObject.getIntValue("code"));
+            result.setCode(baseObject.getIntValue("code"));
+            result.setObj(result.getCode());
             result.ok(baseObject.getBooleanValue("ok"));
             if (result.isOK()) { // ok true
                 if (baseObject.containsKey(mKey)) {

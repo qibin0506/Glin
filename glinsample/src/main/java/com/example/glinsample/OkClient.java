@@ -218,6 +218,7 @@ public class OkClient implements IClient {
                 prntInfo("Error->" + e.getMessage());
                 Result<T> result = new Result<>();
                 result.ok(false);
+                result.setCode(0);
                 result.setObj(0);
                 result.setMessage(MSG_ERROR_HTTP);
                 callback(call, callback, result);
@@ -229,6 +230,7 @@ public class OkClient implements IClient {
                     prntInfo("Response->" + response.code() + ":" + response.message());
                     Result<T> res = new Result<>();
                     res.ok(false);
+                    res.setCode(response.code());
                     res.setObj(response.code());
                     res.setMessage(MSG_ERROR_HTTP);
                     callback(call, callback, res);

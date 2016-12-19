@@ -29,7 +29,8 @@ public class ListParser extends Parser {
                 result.setMessage(baseObject.getString("message"));// message always get
             }
 
-            result.setObj(baseObject.getIntValue("code"));
+            res.setCode(baseObject.getIntValue("code"));
+            result.setObj(res.getCode());
             result.ok(baseObject.getBooleanValue("ok"));
             if (result.isOK()) { // ok true
                 if (baseObject.containsKey(mKey)) {
