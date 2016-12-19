@@ -52,6 +52,11 @@ public class Result<T> {
         this.obj = obj;
     }
 
+    /**
+     * @deprecated use {@link #getCode()} instead
+     * @param <V>
+     * @return
+     */
     public <V> V assertGetObj() {
         return (V) getObj();
     }
