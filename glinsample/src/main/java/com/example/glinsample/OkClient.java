@@ -1,4 +1,4 @@
-package org.loader.superglin;
+package com.example.glinsample;
 
 import android.os.Handler;
 import android.os.Looper;
