@@ -9,25 +9,20 @@ import org.loader.glin.Callback;
 import org.loader.glin.NetResult;
 import org.loader.glin.Params;
 import org.loader.glin.Result;
-import org.loader.glin.cache.DefaultCacheProvider;
 import org.loader.glin.cache.ICacheProvider;
 import org.loader.glin.client.IClient;
 import org.loader.glin.factory.ParserFactory;
-import org.loader.glin.helper.Helper;
-import org.loader.glin.helper.SerializeHelper;
+import org.loader.glin.helper.ClientHelper;
+import org.loader.glin.helper.LogHelper;
 import org.loader.glin.interceptor.IResultInterceptor;
-import org.loader.glin.parser.Parser;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Queue;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -57,15 +52,15 @@ public class OkClient implements IClient {
 
     private OkHttpClient mClient;
     private Handler mHandler;
-    private ParserFactory mParserFactory;
-    private IResultInterceptor mResultInterceptor;
-    private ICacheProvider mCacheProvider;
+
+    private ClientHelper mClientHelper;
 
     private long mTimeOut = DEFAULT_TIME_OUT;
-    private boolean isDebug;
+    private boolean isDebugMode;
 
     public OkClient() {
         mClient = buildClient();
+        mClientHelper = new ClientHelper();
     }
 
     private OkHttpClient buildClient() {
@@ -106,49 +101,191 @@ public class OkClient implements IClient {
     public <T> void get(String url, final LinkedHashMap<String, String> header,
                         Object tag, boolean shouldCache, Callback<T> callback) {
         final Request request = new Request.Builder().url(url).build();
-        call(request, header, null, callback, tag, shouldCache, new StringBuilder());
+        call(request, header, null, callback, tag, shouldCache, getLogHelper());
     }
 
     @Override
     public <T> void post(String url, final LinkedHashMap<String, String> header,
                          Params params, Object tag, boolean shouldCache, Callback<T> callback) {
-        StringBuilder debugInfo = new StringBuilder();
-        MultipartBody builder = createRequestBody(params, debugInfo);
+        LogHelper logHelper = getLogHelper();
+        MultipartBody builder = createRequestBody(params, logHelper);
         Request request = new Request.Builder().url(url).post(builder).build();
-        call(request, header, params.encode(), callback, tag, shouldCache, debugInfo);
+        call(request, header, params.encode(), callback, tag, shouldCache, logHelper);
     }
 
     @Override
     public <T> void post(String url, final LinkedHashMap<String, String> header,
                          String json, Object tag, boolean shouldCache, final Callback<T> callback) {
-        StringBuilder debugInfo = new StringBuilder();
-        Request request = new Request.Builder().url(url).post(createJsonBody(json, debugInfo)).build();
-        call(request, header, json, callback, tag, shouldCache, debugInfo);
+        LogHelper logHelper = getLogHelper();
+        Request request = new Request.Builder().url(url).post(createJsonBody(json, logHelper)).build();
+        call(request, header, json, callback, tag, shouldCache, logHelper);
     }
 
     @Override
     public <T> void put(String url, final LinkedHashMap<String, String> header,
                         Params params, Object tag, boolean shouldCache, Callback<T> callback) {
-        StringBuilder debugInfo = new StringBuilder();
-        MultipartBody builder = createRequestBody(params, debugInfo);
+        LogHelper logHelper = getLogHelper();
+        MultipartBody builder = createRequestBody(params, logHelper);
         Request request = new Request.Builder().url(url).put(builder).build();
-        call(request, header, params.encode(), callback, tag, shouldCache, debugInfo);
+        call(request, header, params.encode(), callback, tag, shouldCache, logHelper);
     }
 
     @Override
     public <T> void put(String url, final LinkedHashMap<String, String> header,
                         String json, Object tag, boolean shouldCache, Callback<T> callback) {
-        StringBuilder debugInfo = new StringBuilder();
-        Request request = new Request.Builder().url(url).put(createJsonBody(json, debugInfo)).build();
-        call(request, header, json, callback, tag, shouldCache, debugInfo);
+        LogHelper logHelper = getLogHelper();
+        Request request = new Request.Builder().url(url).put(createJsonBody(json, logHelper)).build();
+        call(request, header, json, callback, tag, shouldCache, logHelper);
     }
 
     @Override
     public <T> void delete(String url, final LinkedHashMap<String, String> header,
                            Object tag, boolean shouldCache, Callback<T> callback) {
-        StringBuilder debugInfo = new StringBuilder();
         final Request request = new Request.Builder().url(url).delete().build();
-        call(request, header, null, callback, tag, shouldCache, debugInfo);
+        call(request, header, null, callback, tag, shouldCache, getLogHelper());
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> void call(Request request, final LinkedHashMap<String, String> header,
+                          final String params, final Callback<T> callback, final Object tag,
+                          final boolean shouldCache, LogHelper helper) {
+        final String cacheKey = mClientHelper.getCacheKey(request.url().toString(), params);
+
+        Result<T> result = mClientHelper.useCache(shouldCache, cacheKey, callback);
+        if (result != null) {
+            helper.getLogAppender().append("\nUseCache->").append(cacheKey).append("\n");
+            callback.onResponse(result);
+        }
+
+        String info = helper.getLogAppender().toString();
+        helper.getLogAppender().delete(0, helper.getLogAppender().length());
+
+        helper.getLogAppender().append("URL->").append(request.url().toString()).append("\n");
+        helper.getLogAppender().append("Method->").append(request.method()).append("\n");
+
+        LinkedHashMap<String, String> map = (header != null && !header.isEmpty())
+                ? header : headers();
+        Request.Builder builder = request.newBuilder();
+        builder.tag(tag);
+        if (map != null && !map.isEmpty()) {
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                String value = entry.getValue();
+                if(value == null) { continue;}
+                builder.addHeader(entry.getKey(), value);
+            }
+        }
+        request = builder.build();
+        final Call call = cloneClient().newCall(request);
+        call.enqueue(new okhttp3.Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                getLogHelper().print("Error->" + e.getMessage());
+
+                Result<T> result = new Result<>();
+                result.ok(false);
+                result.setCode(0);
+                result.setObj(0);
+                result.setMessage(MSG_ERROR_HTTP);
+
+                callback(call, callback, result);
+            }
+
+            @Override
+            public void onResponse(final Call call, Response response) throws IOException {
+                if (!response.isSuccessful()) {
+                    getLogHelper().print("Response->" + response.code() + ":" + response.message());
+
+                    Result<T> res = new Result<>();
+                    res.ok(false);
+                    res.setCode(response.code());
+                    res.setObj(response.code());
+                    res.setMessage(MSG_ERROR_HTTP);
+
+                    callback(call, callback, res);
+                    return;
+                }
+
+                String resp = "";
+                try {
+                    resp = response.body().string();
+                } catch (Exception e) {
+                    getLogHelper().print("response.body->" + replaceBlank(e.getMessage()));
+                }
+
+                getLogHelper().print("Response->" + replaceBlank(resp));
+
+                NetResult netResult = new NetResult(response.code(), response.message(), resp);
+                Result<T> res = mClientHelper.parseResponse(callback, netResult);
+                callback(call, callback, res);
+
+                if (mClientHelper.cache(shouldCache, cacheKey, res, netResult)) {
+                    getLogHelper().print("CacheResult->" + cacheKey);
+                }
+            }
+        });
+
+        String debugHeader = request.headers().toString();
+        if(!TextUtils.isEmpty(debugHeader)) {
+            helper.getLogAppender().append("Header->").append(debugHeader).append("\n");
+        }
+
+        helper.getLogAppender().append("\n");
+        helper.getLogAppender().append(info);
+        helper.print();
+    }
+
+    private <T> void callback(final Call call, final Callback<T> callback, final Result<T> result) {
+        if(Looper.myLooper() == Looper.getMainLooper()) {
+            realCallback(call, callback, result);
+        }else {
+            getHandler().post(new Runnable() {
+                @Override
+                public void run() { realCallback(call, callback, result);}
+            });
+        }
+    }
+
+    private <T> void realCallback(Call call, Callback<T> callback, Result<T> result) {
+        if (call.isCanceled()) { return;}
+        if (!mClientHelper.shouldInterceptResult(result)) { callback.onResponse(result);}
+    }
+
+    private MultipartBody createRequestBody(Params params, LogHelper logHelper) {
+        logHelper.getLogAppender().append("Params->");
+        MultipartBody.Builder builder = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM);
+
+        LinkedHashMap<String, String> map = params.get();
+        for(Map.Entry<String, String> entry : map.entrySet()) {
+            String value = entry.getValue();
+            if(value == null) { continue;}
+
+            logHelper.getLogAppender().append(entry.getKey()).append(":").append(value).append(";");
+            builder.addPart(Headers.of("Content-Disposition",
+                    "form-data; name=\""+ entry.getKey() +"\""),
+                    RequestBody.create(null, value));
+        }
+
+        logHelper.getLogAppender().append("\nFiles->");
+
+        LinkedHashMap<String, File> files = params.files();
+        for(Map.Entry<String, File> entry : files.entrySet()) {
+            File file = entry.getValue();
+            if(file == null) { continue;}
+
+            logHelper.getLogAppender().append(entry.getKey()).append(":").append(file.getName());
+            builder.addPart(Headers.of("Content-Disposition",
+                    "form-data; name=\"" + entry.getKey() + "\";filename=\""+ file.getName() +"\""),
+                    RequestBody.create(MediaType.parse("application/octet-stream"), file));
+        }
+
+        logHelper.getLogAppender().append("\n");
+        return builder.build();
+    }
+
+    private RequestBody createJsonBody(String json, LogHelper logHelper) {
+        logHelper.getLogAppender().append("RequestJson->").append(json);
+        return RequestBody.create(MediaType.parse("application/json;charset=utf-8"), json);
     }
 
     @Override
@@ -166,113 +303,43 @@ public class OkClient implements IClient {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private <T> void call(Request request, final LinkedHashMap<String, String> header,
-                          final String params, final Callback<T> callback, final Object tag,
-                          final boolean shouldCache, StringBuilder debugInfo) {
-        final String cacheKey = mCacheProvider == null ? null :
-                mCacheProvider.getKey(request.url().toString(), params);
-
-        final Class<?> callbackKlass = callback.getClass();
-        // data_struct.class or List.class
-        // Callback<List<String>>
-        final Class<T> dataKlass = Helper.getType(callbackKlass);
-        final boolean resultTypeIsArray = resultTypeIsArray(dataKlass);
-        if (shouldCache && mCacheProvider != null) {
-            // data struct or List.class
-            Result<T> result;
-            if (resultTypeIsArray) {
-                Class<T> klass = Helper.getDeepType(callbackKlass);
-                result = mCacheProvider.get(cacheKey, klass, true);
-            }else {
-                result = mCacheProvider.get(cacheKey, dataKlass, false);
-            }
-            if (result != null && result.isOK()) {
-                callback.onResponse(result);
-            }
-        }
-
-        String info = debugInfo.toString();
-        debugInfo.delete(0, debugInfo.length());
-
-        debugInfo.append("URL->").append(request.url().toString()).append("\n");
-        debugInfo.append("Method->").append(request.method()).append("\n");
-
-        LinkedHashMap<String, String> map = (header != null && !header.isEmpty())
-                ? header : headers();
-        Request.Builder builder = request.newBuilder();
-        builder.tag(tag);
-        if (map != null && !map.isEmpty()) {
-            for (Iterator<String> iterator = map.keySet().iterator(); iterator.hasNext();) {
-                String key = iterator.next();
-                String value = map.get(key);
-                if(value == null) continue;
-                builder.addHeader(key, value);
-            }
-        }
-        request = builder.build();
-        final Call call = cloneClient().newCall(request);
-        call.enqueue(new okhttp3.Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                prntInfo("Error->" + e.getMessage());
-                Result<T> result = new Result<>();
-                result.ok(false);
-                result.setCode(0);
-                result.setObj(0);
-                result.setMessage(MSG_ERROR_HTTP);
-                callback(call, callback, result);
-            }
-
-            @Override
-            public void onResponse(final Call call, Response response) throws IOException {
-                if (!response.isSuccessful()) {
-                    prntInfo("Response->" + response.code() + ":" + response.message());
-                    Result<T> res = new Result<>();
-                    res.ok(false);
-                    res.setCode(response.code());
-                    res.setObj(response.code());
-                    res.setMessage(MSG_ERROR_HTTP);
-                    callback(call, callback, res);
-                    return;
-                }
-
-                String resp = response.body().string();
-                prntInfo("Response->" + replaceBlank(resp));
-                NetResult netResult = new NetResult(response.code(), response.message(), resp);
-
-                Result<T> res;
-                // if dataKlass == List.class
-                if (resultTypeIsArray) {
-                    // data_struct.class
-                    Class<T> klass = Helper.getDeepType(callbackKlass);
-                    res = mParserFactory.getListParser().parse(klass, netResult);
-                } else {
-                    res = mParserFactory.getParser().parse(dataKlass, netResult);
-                }
-
-                callback(call, callback, res);
-                if (shouldCache && mCacheProvider != null && res.isOK()) {
-                    prntInfo("CacheResult->" + cacheKey);
-                    mCacheProvider.put(cacheKey, netResult, res);
-                }
-            }
-        });
-
-        String debugHeader = request.headers().toString();
-        if(!TextUtils.isEmpty(debugHeader)) {
-            debugInfo.append("Header->").append(debugHeader).append("\n");
-        }
-        debugInfo.append("\n");
-        debugInfo.append(info);
-        prntInfo(debugInfo.toString());
+    @Override
+    public void parserFactory(ParserFactory factory) {
+        mClientHelper.ParserFactory(factory);
     }
 
-    private <T> boolean resultTypeIsArray(Class<T> dataKlass) {
-        if (List.class.isAssignableFrom(dataKlass)) {
-            return true;
-        }
-        return false;
+    @Override
+    public void cacheProvider(ICacheProvider provider) {
+        mClientHelper.CacheProvider(provider);
+    }
+
+    @Override
+    public void resultInterceptor(IResultInterceptor interceptor) {
+        mClientHelper.ResultInterceptor(interceptor);
+    }
+
+    @Override
+    public void timeout(long ms) {
+        mTimeOut = ms;
+    }
+
+    @Override
+    public void debugMode(boolean debug) {
+        isDebugMode = debug;
+    }
+
+    @Override
+    public LinkedHashMap<String, String> headers() {
+        return null;
+    }
+
+    private Handler getHandler() {
+        if(mHandler == null) { mHandler = new Handler(Looper.getMainLooper());}
+        return mHandler;
+    }
+
+    private LogHelper getLogHelper() {
+        return LogHelper.get(isDebugMode, mLogPrinter);
     }
 
     private static String replaceBlank(String str) {
@@ -285,109 +352,6 @@ public class OkClient implements IClient {
         return dest;
     }
 
-    private void prntInfo(String info) {
-        if (!isDebug) { return;}
-
-        Log.d("Glin", "*******************--BEGIN--*******************");
-        Log.d("Glin", info);
-        Log.d("Glin", "********************--END--********************");
-    }
-
-    private <T> void callback(final Call call, final Callback<T> callback, final Result<T> result) {
-        if(Looper.myLooper() == Looper.getMainLooper()) {
-            realCallback(call, callback, result);
-        }else {
-            getHandler().post(new Runnable() {
-                @Override
-                public void run() {
-                    realCallback(call, callback, result);
-                }
-            });
-        }
-    }
-
-    private <T> void realCallback(Call call, Callback<T> callback, Result<T> result) {
-//        if (isDebug) { Log.d("Glin", "call is canceled ? " + call.isCanceled());}
-        if (call.isCanceled()) { return;}
-        if (!intercept(result)) { callback.onResponse(result);}
-    }
-
-    private <T> boolean intercept(final Result<T> result) {
-        if (mResultInterceptor != null && mResultInterceptor.intercept(result)) {
-            return true;
-        }
-        return false;
-    }
-
-    private MultipartBody createRequestBody(Params params, StringBuilder debugInfo) {
-        debugInfo.append("Params->");
-        MultipartBody.Builder builder = new MultipartBody.Builder()
-                .setType(MultipartBody.FORM);
-
-        LinkedHashMap<String, String> map = params.get();
-        for(Iterator<String> iterator=map.keySet().iterator();iterator.hasNext();) {
-            String key = iterator.next();
-            String value = map.get(key);
-            if(value == null) continue;
-            debugInfo.append(key).append(":").append(value).append(";");
-            builder.addPart(Headers.of("Content-Disposition",
-                    "form-data; name=\""+ key +"\""),
-                    RequestBody.create(null, value));
-        }
-
-        debugInfo.append("\nFiles->");
-
-        LinkedHashMap<String, File> files = params.files();
-        for(Iterator<String> iterator=files.keySet().iterator();iterator.hasNext();) {
-            String key = iterator.next();
-            File file = files.get(key);
-            if(file == null) continue;
-            debugInfo.append(key).append(":").append(file.getName());
-            builder.addPart(Headers.of("Content-Disposition",
-                    "form-data; name=\"" + key + "\";filename=\""+ file.getName() +"\""),
-                    RequestBody.create(MediaType.parse("application/octet-stream"), file));
-        }
-
-        debugInfo.append("\n");
-        return builder.build();
-    }
-
-    private RequestBody createJsonBody(String json, StringBuilder debugInfo) {
-        debugInfo.append("RequestJson->").append(json);
-        RequestBody body = RequestBody.create(MediaType.parse("application/json;charset=utf-8"), json);
-        return body;
-    }
-
-    private Handler getHandler() {
-        if(mHandler == null) { mHandler = new Handler(Looper.getMainLooper());}
-        return mHandler;
-    }
-
-    @Override
-    public LinkedHashMap<String, String> headers() {
-        return null;
-    }
-
-    @Override
-    public void parserFactory(ParserFactory factory) {
-        mParserFactory = factory;
-    }
-
-    @Override
-    public void timeout(long ms) {
-        mTimeOut = ms;
-    }
-
-    @Override
-    public void debugMode(boolean debug) {
-        isDebug = debug;
-    }
-
-    @Override
-    public void cacheProvider(ICacheProvider provider) {
-        mCacheProvider = provider;
-    }
-
     private OkHttpClient cloneClient() {
         return mClient.newBuilder()
                 .connectTimeout(mTimeOut, TimeUnit.MILLISECONDS)
@@ -396,8 +360,10 @@ public class OkClient implements IClient {
                 .build();
     }
 
-    @Override
-    public void resultInterceptor(IResultInterceptor interceptor) {
-        mResultInterceptor = interceptor;
-    }
+    private LogHelper.LogPrinter mLogPrinter = new LogHelper.LogPrinter() {
+        @Override
+        public void print(String tag, String content) {
+            Log.d(tag, content);
+        }
+    };
 }
