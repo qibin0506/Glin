@@ -305,17 +305,17 @@ public class OkClient implements IClient {
 
     @Override
     public void parserFactory(ParserFactory factory) {
-        mClientHelper.ParserFactory(factory);
+        mClientHelper.parserFactory(factory);
     }
 
     @Override
     public void cacheProvider(ICacheProvider provider) {
-        mClientHelper.CacheProvider(provider);
+        mClientHelper.cacheProvider(provider);
     }
 
     @Override
     public void resultInterceptor(IResultInterceptor interceptor) {
-        mClientHelper.ResultInterceptor(interceptor);
+        mClientHelper.resultInterceptor(interceptor);
     }
 
     @Override
