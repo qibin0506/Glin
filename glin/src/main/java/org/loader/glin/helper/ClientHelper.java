@@ -18,17 +18,17 @@ public final class ClientHelper {
     private ICacheProvider mCacheProvider;
     private IResultInterceptor mResultInterceptor;
 
-    public ClientHelper ParserFactory(ParserFactory parserFactory) {
+    public ClientHelper parserFactory(ParserFactory parserFactory) {
         mParserFactory = parserFactory;
         return this;
     }
 
-    public ClientHelper CacheProvider(ICacheProvider cacheProvider) {
+    public ClientHelper cacheProvider(ICacheProvider cacheProvider) {
         mCacheProvider = cacheProvider;
         return this;
     }
 
-    public ClientHelper ResultInterceptor(IResultInterceptor resultInterceptor) {
+    public ClientHelper resultInterceptor(IResultInterceptor resultInterceptor) {
         mResultInterceptor = resultInterceptor;
         return this;
     }
