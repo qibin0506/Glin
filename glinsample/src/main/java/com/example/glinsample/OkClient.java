@@ -349,6 +349,7 @@ public class OkClient implements IClient {
             Matcher m = p.matcher(str);
             dest = m.replaceAll("");
         }
+        
         return dest;
     }
 
