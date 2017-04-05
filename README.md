@@ -4,6 +4,16 @@ Glin, A retrofit like network framework
 
 ### Usage
 
+#### get Glin
+if you want to use Glin only, copy this code to your gradle
+``` java
+compile 'org.loader:glin:1.0.2'
+```
+if you want to use Glin and the default OkClient, copy this code to your gradle
+``` java
+compile 'org.loader:glin-okclient:1.0.0'
+```
+
 #### write your client and parser, config glin
 ``` java
 Glin glin = new Glin.Builder()
