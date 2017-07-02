@@ -83,7 +83,7 @@ public class Glin {
     }
 
     public void register(Class<? extends Annotation> key, Class<? extends Call> value) {
-        mCallFactory.regist(key, value);
+        mCallFactory.register(key, value);
     }
 
     class Handler implements InvocationHandler {
