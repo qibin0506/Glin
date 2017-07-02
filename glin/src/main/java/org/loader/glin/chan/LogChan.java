@@ -1,6 +1,3 @@
-/**
- * Copyright 2017,Smart Haier.All rights reserved
- */
 package org.loader.glin.chan;
 
 import org.loader.glin.Context;
@@ -13,9 +10,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * <p class="note">File Note</p>
- * created by qibin at 2017/7/1 
+ * Created by qibin on 2016/7/13.
  */
+
 public class LogChan extends Chan implements Cloneable {
 
     private boolean isDebug;

@@ -1,13 +1,8 @@
 package org.loader.glin.helper;
 
 /**
- * <p>function: </p>
- * <p>description:  </p>
- * <p>history:  1. 2017/2/14</p>
- * <p>Author: qibin</p>
- * <p>modification:</p>
+ * Created by qibin on 2016/7/13.
  */
-
 public class LogHelper {
     private boolean isDebugMode;
     private LogPrinter mLogPrinter;

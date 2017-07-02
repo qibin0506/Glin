@@ -1,14 +1,11 @@
-/**
- * Copyright 2017,Smart Haier.All rights reserved
- */
 package org.loader.glin.chan;
 
 import org.loader.glin.Context;
 
 /**
- * <p class="note">File Note</p>
- * created by qibin at 2017/7/1 
+ * Created by qibin on 2016/7/13.
  */
+
 public abstract class Chan {
     private Chan mNext;
     private Context mContext;

@@ -1,14 +1,11 @@
-/**
- * Copyright 2017,Smart Haier.All rights reserved
- */
 package org.loader.glin;
 
 import org.loader.glin.call.Call;
 
 /**
- * <p class="note">File Note</p>
- * created by qibin at 2017/7/1 
+ * Created by qibin on 2016/7/13.
  */
+
 public class Context {
     private Call<?> call;
     private Result<?> result;
