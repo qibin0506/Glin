@@ -1,5 +1,4 @@
 apply plugin: 'java'
-apply plugin: 'com.novoda.bintray-release'
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
@@ -7,12 +6,3 @@ dependencies {
 
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"
-
-publish {
-    userOrg = 'qibin'
-    groupId = 'org.loader'
-    artifactId = 'Glin'
-    publishVersion = '2.0'
-    desc = 'Glin'
-    website = 'https://github.com/qibin0506/Glin'
-}
