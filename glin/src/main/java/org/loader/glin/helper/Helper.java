@@ -4,7 +4,6 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.math.BigInteger;
 import java.security.MessageDigest;
-import java.util.List;
 
 /**
  * Created by qibin on 2016/7/13.

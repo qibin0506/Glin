@@ -1,6 +1,6 @@
 package org.loader.glin.parser;
 
-import org.loader.glin.NetResult;
+import org.loader.glin.RawResult;
 import org.loader.glin.Result;
 
 /**
@@ -25,5 +25,5 @@ public abstract class Parser {
      * @param <T>
      * @return
      */
-    public abstract <T> Result<T> parse(Class<T> klass, NetResult netResult);
+    public abstract <T> Result<T> parse(Class<T> klass, RawResult netResult);
 }

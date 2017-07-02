@@ -17,5 +17,4 @@ public interface IClient extends IRequest {
     void resultInterceptor(IResultInterceptor interceptor);
     void cacheProvider(ICacheProvider provider);
     void timeout(long ms);
-    void debugMode(boolean debug);
 }

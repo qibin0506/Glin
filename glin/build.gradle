@@ -1,6 +1,8 @@
 apply plugin: 'java'
 
 dependencies {
-    targetCompatibility = '1.7'
-    sourceCompatibility = '1.7'
+    compile fileTree(dir: 'libs', include: ['*.jar'])
 }
+
+sourceCompatibility = "1.7"
+targetCompatibility = "1.7"

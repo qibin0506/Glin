@@ -1,7 +1,7 @@
 package org.loader.glin.helper;
 
 import org.loader.glin.Callback;
-import org.loader.glin.NetResult;
+import org.loader.glin.RawResult;
 import org.loader.glin.Result;
 import org.loader.glin.cache.ICacheProvider;
 import org.loader.glin.factory.ParserFactory;
@@ -40,7 +40,7 @@ public final class ClientHelper {
      * @param <T>
      * @return return the result
      */
-    public <T> Result<T> parseResponse(Callback<T> callback, NetResult netResult) {
+    public <T> Result<T> parseResponse(Callback<T> callback, RawResult netResult) {
         final Class<?> callbackKlass = callback.getClass();
         final Class<T> dataKlass = Helper.getType(callbackKlass);
         final boolean resultTypeIsArray = resultTypeIsArray(dataKlass);
@@ -106,7 +106,7 @@ public final class ClientHelper {
      * @return return true if cache ok, otherwise return false
      */
     public <T> boolean cache(boolean shouldCache, String cacheKey, Result<T> result,
-                          NetResult netResult) {
+                          RawResult netResult) {
         if (shouldCache && mCacheProvider != null && result.isOK()) {
             mCacheProvider.put(cacheKey, netResult, result);
             return true;

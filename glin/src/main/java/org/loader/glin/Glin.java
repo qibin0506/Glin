@@ -35,13 +35,16 @@ package org.loader.glin;
 
 import org.loader.glin.annotation.Arg;
 import org.loader.glin.annotation.JSON;
+import org.loader.glin.annotation.Path;
 import org.loader.glin.annotation.ShouldCache;
 import org.loader.glin.cache.ICacheProvider;
 import org.loader.glin.call.Call;
+import org.loader.glin.chan.LogChan;
 import org.loader.glin.client.IClient;
 import org.loader.glin.factory.CallFactory;
 import org.loader.glin.factory.ParserFactory;
 import org.loader.glin.interceptor.IResultInterceptor;
+import org.loader.glin.utils.Pair;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -59,10 +62,13 @@ public class Glin {
     private IClient mClient;
     private String mBaseUrl;
     private CallFactory mCallFactory;
+    private LogChan mLogChan;
 
-    private Glin(IClient client, String baseUrl) {
-        mClient = client;
-        mBaseUrl = baseUrl;
+    private Glin(Builder builder) {
+        mClient = builder.mClient;
+        mBaseUrl = builder.mBaseUrl;
+        mLogChan = builder.mLogChan;
+
         mCallFactory = new CallFactory();
     }
 
@@ -106,28 +112,6 @@ public class Glin {
                 }
             }
 
-//            if (method.isAnnotationPresent(JSON.class)) {
-//                if(!method.isAnnotationPresent(POST.class)) {
-//                    throw new UnsupportedOperationException("cannot find POST annotation");
-//                }
-//                key = JSON.class;
-//                path = method.getAnnotation(POST.class).value();
-//            } else {
-//                HashMap<Class<? extends Annotation>, Class<? extends Call>> mapping = mCallFactory.get();
-//                Class<? extends Annotation> item;
-//                Annotation anno;
-//                for (Iterator<Class<? extends Annotation>> iterator = mapping.keySet().iterator();
-//                    iterator.hasNext();) {
-//                    item = iterator.next();
-//                    if (method.isAnnotationPresent(item)) {
-//                        key = item;
-//                        anno = method.getAnnotation(item);
-//                        path = (String) anno.getClass().getDeclaredMethod("value").invoke(anno);
-//                        break;
-//                    }
-//                }
-//            }
-
             if (key == null) {
                 throw new UnsupportedOperationException("cannot find annotations");
             }
@@ -138,10 +122,16 @@ public class Glin {
             }
 
             boolean shouldCache = method.isAnnotationPresent(ShouldCache.class);
-            Constructor<? extends Call> constructor = callKlass.getConstructor(IClient.class, String.class,
-                    Params.class, Object.class, boolean.class);
-            Call<?> call = constructor.newInstance(mClient, justUrl(path),
-                    params(method, args), mTag, shouldCache);
+
+            Pair<String, Params> pair = new Pair<>(justUrl(path), new Params());
+            params(pair, method, args);
+
+            Constructor<? extends Call> constructor = callKlass.getConstructor(IClient.class,
+                    String.class, Params.class, Object.class, boolean.class, LogChan.class);
+
+            Call<?> call = constructor.newInstance(mClient, pair.first, pair.second, mTag,
+                    shouldCache, mLogChan);
+
             return call;
         }
 
@@ -160,32 +150,42 @@ public class Glin {
             return false;
         }
 
-        private Params params(Method method, Object[] args) {
-            Params params = new Params();
+        private void params(Pair<String, Params> pair, Method method, Object[] args) {
             if (args == null || args.length == 0) {
-                return params;
+                return;
             }
 
             // method.getParameterAnnotations.length always equals args.length
             Annotation[][] paramsAnno = method.getParameterAnnotations();
-            if (method.isAnnotationPresent(JSON.class)) {
-                params.add(Params.DEFAULT_JSON_KEY, args[0]);
-                return params;
-            }
+//            if (method.isAnnotationPresent(JSON.class)) {
+//                params.add(Params.DEFAULT_JSON_KEY, args[0]);
+//                return params;
+//            }
 
             int length = paramsAnno.length;
             for (int i = 0; i < length; i++) {
-                if (paramsAnno[i].length == 0) { params.add(Params.DEFAULT_JSON_KEY, args[i]);}
-                else { params.add(((Arg)paramsAnno[i][0]).value(), args[i]);}
+                if (paramsAnno[i].length == 0) {
+                    // there is no annotation on this param,
+                    // so, maybe it is a json value when the method is JSON annotation presented
+                    if (method.isAnnotationPresent(JSON.class)) {
+                        pair.second.add(Params.DEFAULT_JSON_KEY, args[i]);
+                    }
+                } else {
+                    if (paramsAnno[i][0] instanceof Arg) {
+                        pair.second.add(((Arg)paramsAnno[i][0]).value(), args[i]);
+                    } else if (paramsAnno[i][0] instanceof Path) {
+                        pair.first = pair.first.replaceAll("\\{:"+((Path)paramsAnno[i][0]).value()+"\\}",
+                                args[i].toString());
+                    }
+                }
             }
-
-            return params;
         }
     }
 
     public static class Builder {
         private IClient mClient;
         private String mBaseUrl;
+        private LogChan mLogChan;
 
         public Builder() {
 
@@ -198,6 +198,11 @@ public class Glin {
 
         public Builder client(IClient client) {
             mClient = client;
+            return this;
+        }
+
+        public Builder logChan(LogChan logChan) {
+            mLogChan = logChan;
             return this;
         }
 
@@ -233,16 +238,8 @@ public class Glin {
             return this;
         }
 
-        public Builder debug(boolean debugMode) {
-            if (mClient == null) {
-                throw new UnsupportedOperationException("invoke client method first");
-            }
-            mClient.debugMode(debugMode);
-            return this;
-        }
-
         public Glin build() {
-            return new Glin(mClient, mBaseUrl);
+            return new Glin(this);
         }
     }
 }

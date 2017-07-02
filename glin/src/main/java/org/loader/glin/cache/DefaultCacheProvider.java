@@ -1,6 +1,6 @@
 package org.loader.glin.cache;
 
-import org.loader.glin.NetResult;
+import org.loader.glin.RawResult;
 import org.loader.glin.Result;
 import org.loader.glin.helper.Helper;
 import org.loader.glin.helper.SerializeHelper;
@@ -41,7 +41,7 @@ public class DefaultCacheProvider implements ICacheProvider {
      * {@inheritDoc}
      */
     @Override
-    public <T> void put(String key, NetResult netResult, Result<T> result) {
+    public <T> void put(String key, RawResult netResult, Result<T> result) {
         checkCacheSize();
         SerializeHelper.serialize(mCachePath, key + SUFFIX, result.getResult());
     }

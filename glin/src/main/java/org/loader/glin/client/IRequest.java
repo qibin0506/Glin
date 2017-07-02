@@ -2,7 +2,6 @@ package org.loader.glin.client;
 
 import org.loader.glin.Callback;
 import org.loader.glin.Params;
-import org.loader.glin.annotation.ShouldCache;
 
 import java.util.LinkedHashMap;
 

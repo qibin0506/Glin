@@ -1,6 +1,6 @@
 package org.loader.glin.cache;
 
-import org.loader.glin.NetResult;
+import org.loader.glin.RawResult;
 import org.loader.glin.Result;
 
 public interface ICacheProvider {
@@ -19,7 +19,7 @@ public interface ICacheProvider {
      * @param netResult the origin result
      * @param result parsed result
      */
-    <T> void put(String key, NetResult netResult, Result<T> result);
+    <T> void put(String key, RawResult netResult, Result<T> result);
 
     /**
      * provide the key
