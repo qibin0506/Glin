@@ -7,6 +7,7 @@ package org.loader.glin.helper;
  * <p>Author: qibin</p>
  * <p>modification:</p>
  */
+
 public class LogHelper {
     private boolean isDebugMode;
     private LogPrinter mLogPrinter;

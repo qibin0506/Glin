@@ -38,12 +38,14 @@ public abstract class Call<T> {
 
     public Call(IClient client, String url,
                 Params params, Object tag,
-                boolean cache, LogChan logChan) {
+                boolean cache) {
         mClient = client; mUrl = url;
         mParams = params; mTag = tag;
 
         shouldCache = cache;
+    }
 
+    public void setLogChan(LogChan logChan) {
         mRequestLogChan = logChan;
         mRequestLogChan.beforeCall(true);
 
@@ -111,11 +113,15 @@ public abstract class Call<T> {
     public void enqueue(Callback<T> callback) {
         mCallback = callback;
 
-        before(mRequestLogChan);
+        if (mRequestLogChan != null) {
+            before(mRequestLogChan);
+        }
 
-        Chan after = mAfterChan;
-        mAfterChan = mResponseLogChan;
-        mAfterChan.nextChan(after);
+        if (mResponseLogChan != null) {
+            Chan after = mAfterChan;
+            mAfterChan = mResponseLogChan;
+            mAfterChan.nextChan(after);
+        }
 
         Context ctx = new Context(this);
         callback.attach(ctx, mAfterChan);

@@ -13,8 +13,8 @@ public class GetCall<T> extends Call<T> {
 
     public GetCall(IClient client, String url,
                    Params params, Object tag,
-                   boolean cache, LogChan logChan) {
-        super(client, url, params, tag, cache, logChan);
+                   boolean cache) {
+        super(client, url, params, tag, cache);
     }
 
     @Override

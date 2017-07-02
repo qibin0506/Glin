@@ -127,10 +127,12 @@ public class Glin {
             params(pair, method, args);
 
             Constructor<? extends Call> constructor = callKlass.getConstructor(IClient.class,
-                    String.class, Params.class, Object.class, boolean.class, LogChan.class);
+                    String.class, Params.class, Object.class, boolean.class);
 
-            Call<?> call = constructor.newInstance(mClient, pair.first, pair.second, mTag,
-                    shouldCache, mLogChan);
+            Call<?> call = constructor.newInstance(mClient, pair.first, pair.second,
+                    mTag, shouldCache);
+
+            if (mLogChan != null) { call.setLogChan(mLogChan);}
 
             return call;
         }
