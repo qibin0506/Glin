@@ -82,7 +82,7 @@ public class Glin {
         mClient.cancel(tag);
     }
 
-    public void regist(Class<? extends Annotation> key, Class<? extends Call> value) {
+    public void register(Class<? extends Annotation> key, Class<? extends Call> value) {
         mCallFactory.regist(key, value);
     }
 

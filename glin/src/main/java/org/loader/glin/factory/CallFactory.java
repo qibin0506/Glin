@@ -28,14 +28,14 @@ public class CallFactory {
     }
 
     private void autoRegist() {
-        regist(JSON.class, JsonCall.class);
-        regist(GET.class, GetCall.class);
-        regist(POST.class, PostCall.class);
-        regist(PUT.class, PutCall.class);
-        regist(DEL.class, DelCall.class);
+        register(JSON.class, JsonCall.class);
+        register(GET.class, GetCall.class);
+        register(POST.class, PostCall.class);
+        register(PUT.class, PutCall.class);
+        register(DEL.class, DelCall.class);
     }
 
-    public void regist(Class<? extends Annotation> key, Class<? extends Call> value) {
+    public void register(Class<? extends Annotation> key, Class<? extends Call> value) {
         mMapping.put(key, value);
     }
 
