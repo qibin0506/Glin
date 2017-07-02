@@ -234,7 +234,7 @@ Glin glin = new Glin.Builder()
 
 继承Chan类, 实现自定义中间件, 实现run(Context ctx)方法, 在run方法里调用next()方法使流程继续.
 通过调用Call的before(Chan chan)方法设置请求前的中间件, 在调用before(Chan chan)后, 可通过使用一系列的next(Chan chan)方法设置请求前的中间件.
-通过调用Call的after(Chan chan)方法设置请求后的中间件, 在调用after(Chan chan)后, 可通过使用一系列的next(Chan chan)方法设置请求前的中间件.
+通过调用Call的after(Chan chan)方法设置请求后的中间件, 在调用after(Chan chan)后, 可通过使用一系列的next(Chan chan)方法设置请求后的中间件.
 
 例子(该例子实现了请求前检查用户id, 如果不存在, 则请求用户id接口, 然后发起请求获取用户信息, 最后检查用户信息)
 
