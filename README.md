@@ -148,7 +148,7 @@ private static final LogHelper.LogPrinter logPrinter = new LogHelper.LogPrinter(
 
 Glin glin = new Glin.Builder()
     .client(new OkClient())
-    .baseUrl("http://192.168.201.39") // the basic url
+    .baseUrl("http://exampile.com") // the basic url
     .logChan(new LogChan(true, logPrinter)) // log printer
     .parserFactory(new FastJsonParserFactory()) // your parser factory
     .cacheProvider(new DefaultCacheProvider(Environment.getExternalStorageDirectory() + "/test/", 2000)) // use default cacheProvider
@@ -188,28 +188,28 @@ Glin glin = new Glin.Builder()
 ### get 请求
 
 ``` java
-    @GET("http://example.com")
+    @GET("/info")
     Call<User> getUser(@Arg("username") String name);
 ```
 
 ### post 请求
 
 ``` java
-    @POST("http://example.com")
+    @POST("/info")
     Call<User> getUser(@Arg("username") String name);
 ```
 
 ### delete 请求
 
 ``` java
-    @DEL("http://example.com")
+    @DEL("/info")
     Call<User> deleteUser(@Arg("username") String name);
 ```
 
 ### put 请求
 
 ``` java
-    @PUT("http://example.com")
+    @PUT("/info")
     Call<User> putUser(@Arg("username") String name);
 ```
 
@@ -217,14 +217,14 @@ Glin glin = new Glin.Builder()
 ### json 请求
 
 ``` java
-    @JSON("http://example.com")
+    @JSON("/info")
     Call<User> getUser(String name);
 ```
 
 ### 添加 url path
 
 ``` java
-    @GET("http://example.com/{:name}/{:age}")
+    @GET("/info/{:name}/{:age}")
     Call<User> getUser(@Path("name") String name, @Path("age") int age);
 ```
 
