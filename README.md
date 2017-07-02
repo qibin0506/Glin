@@ -280,7 +280,7 @@ class UserInfoChan extends Chan {
 
 ``` java
 // 使用中间件
-Call<User> call = Net.get().create(Api.class, tag).userInfo();
+Call<User> call = glin.create(Api.class, tag).userInfo();
 call.before(new UserIdChan()).next(new OtherBeforeChan())
     .after(new UserInfoChan()).next(new OtherAfterChan())
     .enqueue(new Callback<User>() {
