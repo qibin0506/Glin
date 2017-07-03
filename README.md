@@ -20,7 +20,7 @@ Glin, 一款灵活支持中间件的Java&Android动态代理网络框架
     8. more...
 
 ### 升级日志
-    v2.0
+    v2.1
         1. 支持中间件
         
         2. 添加@Path注解
@@ -34,13 +34,13 @@ Glin, 一款灵活支持中间件的Java&Android动态代理网络框架
 #### 获取 Glin
 在你的gradle中添加如下compile
 ``` java
-compile 'org.loader:glin:2.0'
+compile 'org.loader:glin:2.1'
 ```
 如果你不想花时间定制网络请求方式, 可使用我提供的OkClient, 添加方法如下
 ``` java
-compile 'org.loader:glin-okclient:2.0'
+compile 'org.loader:glin-okclient:2.1'
 ```
-**注意: 如果使用Glin2.0, glin-okclient就必须使用2.0以上**
+**注意: 如果使用Glin2.1, glin-okclient就必须使用2.1以上**
 
 #### 自定义解析类
 1. 通过继承`Parser`类来实现项目的数据解析类, 通常情况下需要实体类和列表类解析两种
@@ -149,7 +149,7 @@ private static final LogHelper.LogPrinter logPrinter = new LogHelper.LogPrinter(
 Glin glin = new Glin.Builder()
     .client(new OkClient())
     .baseUrl("http://exampile.com") // the basic url
-    .logChan(new LogChan(true, logPrinter)) // log printer
+    .logChanNode(new LogChanNode(true, logPrinter)) // log printer
     .parserFactory(new FastJsonParserFactory()) // your parser factory
     .cacheProvider(new DefaultCacheProvider(Environment.getExternalStorageDirectory() + "/test/", 2000)) // use default cacheProvider
     .timeout(10000) // timeout in ms
@@ -232,9 +232,9 @@ Glin glin = new Glin.Builder()
 
 #### 自定义中间件
 
-继承Chan类, 实现自定义中间件, 实现run(Context ctx)方法, 在run方法里调用next()方法使流程继续.
-通过调用Call的before(Chan chan)方法设置请求前的中间件, 在调用before(Chan chan)后, 可通过使用一系列的next(Chan chan)方法设置请求前的中间件.
-通过调用Call的after(Chan chan)方法设置请求后的中间件, 在调用after(Chan chan)后, 可通过使用一系列的next(Chan chan)方法设置请求后的中间件.
+继承ChanNode类, 实现自定义中间件, 实现run(Context ctx)方法, 在run方法里调用next()方法使流程继续.
+通过调用Call的before(ChanNode chanNode)方法设置请求前的中间件, 在调用before(ChanNode chanNode)后, 可通过使用一系列的next(ChanNode chanNode)方法设置请求前的中间件.
+通过调用Call的after(ChanNode chanNode)方法设置请求后的中间件, 在调用after(ChanNode chanNode)后, 可通过使用一系列的next(ChanNode chanNode)方法设置请求后的中间件.
 
 在中间件中，在网络请求未发起之前， 如果想要修改参数， 可使用`ctx.getCall().getParams()`进行参数修改.
 
@@ -242,7 +242,7 @@ Glin glin = new Glin.Builder()
 
 ``` java
 // 检查用户id的中间件
-class UserIdChan extends Chan {
+class UserIdChanNode extends ChanNode {
     @Override
     public void run(Context ctx) {
         // 如果uid存在, 则继续流程
@@ -266,7 +266,7 @@ class UserIdChan extends Chan {
 
 ``` java
 // 检查用户信息中间件
-class UserInfoChan extends Chan {
+class UserInfoChanNode extends ChanNode {
     @Override
     public void run(Context ctx) {
         if (SpUtils.get("user_name") == null) {
@@ -283,8 +283,8 @@ class UserInfoChan extends Chan {
 ``` java
 // 使用中间件
 Call<User> call = glin.create(Api.class, tag).userInfo();
-call.before(new UserIdChan()).next(new OtherBeforeChan())
-    .after(new UserInfoChan()).next(new OtherAfterChan())
+call.before(new UserIdChanNode()).next(new OtherBeforeChanNode())
+    .after(new UserInfoChanNode()).next(new OtherAfterChanNode())
     .enqueue(new Callback<User>() {
             @Override
             public void onResponse(Result<User> result) {

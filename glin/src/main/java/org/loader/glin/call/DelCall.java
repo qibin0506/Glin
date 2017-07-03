@@ -2,7 +2,6 @@ package org.loader.glin.call;
 
 import org.loader.glin.Callback;
 import org.loader.glin.Params;
-import org.loader.glin.chan.LogChan;
 import org.loader.glin.client.IClient;
 
 /**

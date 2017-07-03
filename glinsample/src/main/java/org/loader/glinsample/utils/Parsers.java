@@ -8,7 +8,6 @@ import org.loader.glin.Result;
 import org.loader.glin.factory.ParserFactory;
 import org.loader.glin.parser.Parser;
 
-
 public class Parsers implements ParserFactory {
 
     @Override

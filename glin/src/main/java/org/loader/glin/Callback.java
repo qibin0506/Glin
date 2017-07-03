@@ -1,6 +1,6 @@
 package org.loader.glin;
 
-import org.loader.glin.chan.Chan;
+import org.loader.glin.chan.ChanNode;
 
 /**
  * Created by qibin on 2016/7/13.
@@ -9,19 +9,19 @@ import org.loader.glin.chan.Chan;
 public abstract class Callback<T> {
 
     private Context mContext;
-    private Chan mAfterChan;
+    private ChanNode mAfterChanNode;
 
-    public final void attach(Context ctx, Chan afterChan) {
+    public final void attach(Context ctx, ChanNode afterChanNode) {
         mContext = ctx;
-        mAfterChan = afterChan;
+        mAfterChanNode = afterChanNode;
     }
 
     public final void afterResponse(Result<T> result, RawResult rawResult) {
         mContext.setRawResult(rawResult);
         mContext.setResult(result);
 
-        if (mAfterChan != null) {
-            mAfterChan.exec(mContext);
+        if (mAfterChanNode != null) {
+            mAfterChanNode.exec(mContext);
         }
     }
 

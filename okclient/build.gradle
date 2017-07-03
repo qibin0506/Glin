@@ -1,4 +1,6 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.novoda.bintray-release'
+
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.0"
@@ -16,6 +18,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    lintOptions {
+        abortOnError false
+    }
 }
 
 dependencies {
@@ -24,5 +30,15 @@ dependencies {
     compile 'com.squareup.okhttp3:okhttp:3.4.1'
     compile 'com.squareup.okio:okio:1.9.0'
 
-    compile 'org.loader:glin:2.0'
+    compile 'org.loader:glin:2.1'
 }
+
+publish {
+    userOrg = 'qibin'
+    groupId = 'org.loader'
+    artifactId = 'glin-okclient'
+    publishVersion = '2.1'
+    desc = 'okhttp client for glin'
+    website = 'https://github.com/qibin0506/Glin'
+}
+

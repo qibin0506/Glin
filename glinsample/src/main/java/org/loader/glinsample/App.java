@@ -2,6 +2,7 @@ package org.loader.glinsample;
 
 import android.app.Application;
 
+
 public class App extends Application {
 
     private static App app;

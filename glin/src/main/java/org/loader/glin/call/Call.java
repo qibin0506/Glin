@@ -4,8 +4,8 @@ import org.loader.glin.Callback;
 import org.loader.glin.Context;
 import org.loader.glin.Params;
 import org.loader.glin.Result;
-import org.loader.glin.chan.Chan;
-import org.loader.glin.chan.LogChan;
+import org.loader.glin.chan.ChanNode;
+import org.loader.glin.chan.LogChanNode;
 import org.loader.glin.client.IClient;
 
 import java.util.LinkedHashMap;
@@ -28,11 +28,11 @@ public abstract class Call<T> {
 
     protected boolean shouldCache;
 
-    private Chan mBeforeChan;
-    private Chan mAfterChan;
+    private ChanNode mBeforeChanNode;
+    private ChanNode mAfterChanNode;
 
-    private Chan mRequestLogChan;
-    private Chan mResponseLogChan;
+    private ChanNode mRequestLogChanNode;
+    private ChanNode mResponseLogChanNode;
 
     private Callback<T> mCallback;
 
@@ -45,13 +45,13 @@ public abstract class Call<T> {
         shouldCache = cache;
     }
 
-    public void setLogChan(LogChan logChan) {
-        mRequestLogChan = logChan;
-        mRequestLogChan.beforeCall(true);
+    public void setLogChanNode(LogChanNode logChanNode) {
+        mRequestLogChanNode = logChanNode;
+        mRequestLogChanNode.beforeCall(true);
 
         try {
-            mResponseLogChan = logChan.clone();
-            mResponseLogChan.beforeCall(false);
+            mResponseLogChanNode = logChanNode.clone();
+            mResponseLogChanNode.beforeCall(false);
         } catch (CloneNotSupportedException e) {
             e.printStackTrace();
         }
@@ -67,45 +67,45 @@ public abstract class Call<T> {
         return this;
     }
 
-    public Call<T> before(Chan chan) {
-        if (mBeforeChan == null) {
-            mBeforeChan = chan;
-            chan.beforeCall(true);
+    public Call<T> before(ChanNode chanNode) {
+        if (mBeforeChanNode == null) {
+            mBeforeChanNode = chanNode;
+            chanNode.beforeCall(true);
         } else {
-            next(chan, mBeforeChan);
+            next(chanNode, mBeforeChanNode);
         }
 
         return this;
     }
 
-    public Call<T> after(Chan chan) {
-        if (mAfterChan == null) {
-            mAfterChan = chan;
-            chan.beforeCall(false);
+    public Call<T> after(ChanNode chanNode) {
+        if (mAfterChanNode == null) {
+            mAfterChanNode = chanNode;
+            chanNode.beforeCall(false);
         } else {
-            next(chan, mAfterChan);
+            next(chanNode, mAfterChanNode);
         }
         return this;
     }
 
-    public Call<T> next(Chan chan) {
-        Chan current = mAfterChan == null ? mBeforeChan : mAfterChan;
-        return next(chan, current);
+    public Call<T> next(ChanNode chanNode) {
+        ChanNode current = mAfterChanNode == null ? mBeforeChanNode : mAfterChanNode;
+        return next(chanNode, current);
     }
 
-    private Call<T> next(Chan chan, Chan header) {
-        Chan current = header;
+    private Call<T> next(ChanNode chanNode, ChanNode header) {
+        ChanNode current = header;
 
         if (current == null) {
             throw new RuntimeException("there is no before chans, please call before() first");
         }
 
-        while(current.nextChan() != null) {
-            current = current.nextChan();
+        while(current.nextChanNode() != null) {
+            current = current.nextChanNode();
         }
 
-        current.nextChan(chan);
-        chan.beforeCall(current.isBeforeCall());
+        current.nextChanNode(chanNode);
+        chanNode.beforeCall(current.isBeforeCall());
 
         return this;
     }
@@ -113,21 +113,21 @@ public abstract class Call<T> {
     public void enqueue(Callback<T> callback) {
         mCallback = callback;
 
-        if (mRequestLogChan != null) {
-            before(mRequestLogChan);
+        if (mRequestLogChanNode != null) {
+            before(mRequestLogChanNode);
         }
 
-        if (mResponseLogChan != null) {
-            Chan after = mAfterChan;
-            mAfterChan = mResponseLogChan;
-            mAfterChan.nextChan(after);
+        if (mResponseLogChanNode != null) {
+            ChanNode after = mAfterChanNode;
+            mAfterChanNode = mResponseLogChanNode;
+            mAfterChanNode.nextChanNode(after);
         }
 
         Context ctx = new Context(this);
-        callback.attach(ctx, mAfterChan);
+        callback.attach(ctx, mAfterChanNode);
 
-        if (mBeforeChan != null) {
-            mBeforeChan.exec(ctx);
+        if (mBeforeChanNode != null) {
+            mBeforeChanNode.exec(ctx);
             return;
         }
 

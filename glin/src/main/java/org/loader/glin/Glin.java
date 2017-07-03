@@ -39,7 +39,7 @@ import org.loader.glin.annotation.Path;
 import org.loader.glin.annotation.ShouldCache;
 import org.loader.glin.cache.ICacheProvider;
 import org.loader.glin.call.Call;
-import org.loader.glin.chan.LogChan;
+import org.loader.glin.chan.LogChanNode;
 import org.loader.glin.client.IClient;
 import org.loader.glin.factory.CallFactory;
 import org.loader.glin.factory.ParserFactory;
@@ -62,12 +62,12 @@ public class Glin {
     private IClient mClient;
     private String mBaseUrl;
     private CallFactory mCallFactory;
-    private LogChan mLogChan;
+    private LogChanNode mLogChanNode;
 
     private Glin(Builder builder) {
         mClient = builder.mClient;
         mBaseUrl = builder.mBaseUrl;
-        mLogChan = builder.mLogChan;
+        mLogChanNode = builder.mLogChanNode;
 
         mCallFactory = new CallFactory();
     }
@@ -132,7 +132,7 @@ public class Glin {
             Call<?> call = constructor.newInstance(mClient, pair.first, pair.second,
                     mTag, shouldCache);
 
-            if (mLogChan != null) { call.setLogChan(mLogChan);}
+            if (mLogChanNode != null) { call.setLogChanNode(mLogChanNode);}
 
             return call;
         }
@@ -187,7 +187,7 @@ public class Glin {
     public static class Builder {
         private IClient mClient;
         private String mBaseUrl;
-        private LogChan mLogChan;
+        private LogChanNode mLogChanNode;
 
         public Builder() {
 
@@ -203,8 +203,8 @@ public class Glin {
             return this;
         }
 
-        public Builder logChan(LogChan logChan) {
-            mLogChan = logChan;
+        public Builder logChanNode(LogChanNode logChanNode) {
+            mLogChanNode = logChanNode;
             return this;
         }
 
