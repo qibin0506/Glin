@@ -236,6 +236,8 @@ Glin glin = new Glin.Builder()
 通过调用Call的before(Chan chan)方法设置请求前的中间件, 在调用before(Chan chan)后, 可通过使用一系列的next(Chan chan)方法设置请求前的中间件.
 通过调用Call的after(Chan chan)方法设置请求后的中间件, 在调用after(Chan chan)后, 可通过使用一系列的next(Chan chan)方法设置请求后的中间件.
 
+在中间件中，在网络请求未发起之前， 如果想要修改参数， 可使用`ctx.getCall().getParams()`进行参数修改.
+
 例子(该例子实现了请求前检查用户id, 如果不存在, 则请求用户id接口, 然后发起请求获取用户信息, 最后检查用户信息)
 
 ``` java
