@@ -1,12 +1,5 @@
-/**
- * Copyright 2017,Smart Haier.All rights reserved
- */
 package org.loader.glinsample.bean;
 
-/**
- * <p class="note">File Note</p>
- * created by qibin at 2017/7/3 
- */
 public class UserInfo {
     private String id;
     private String name;

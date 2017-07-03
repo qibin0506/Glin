@@ -1,6 +1,3 @@
-/**
- * Copyright 2017,Smart Haier.All rights reserved
- */
 package org.loader.glinsample.chan;
 
 import android.content.SharedPreferences;
@@ -16,10 +13,6 @@ import org.loader.glinsample.api.Api;
 import org.loader.glinsample.bean.UserInfo;
 import org.loader.glinsample.utils.Net;
 
-/**
- * <p class="note">File Note</p>
- * created by qibin at 2017/7/3 
- */
 public class UserNameChan extends Chan {
 
     @Override

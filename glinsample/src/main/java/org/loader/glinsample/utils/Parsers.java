@@ -1,6 +1,3 @@
-/**
- * Copyright 2017,Smart Haier.All rights reserved
- */
 package org.loader.glinsample.utils;
 
 import com.alibaba.fastjson.JSON;
@@ -11,10 +8,7 @@ import org.loader.glin.Result;
 import org.loader.glin.factory.ParserFactory;
 import org.loader.glin.parser.Parser;
 
-/**
- * <p class="note">File Note</p>
- * created by qibin at 2017/7/3 
- */
+
 public class Parsers implements ParserFactory {
 
     @Override

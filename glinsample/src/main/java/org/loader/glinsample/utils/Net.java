@@ -1,6 +1,3 @@
-/**
- * Copyright 2017,Smart Haier.All rights reserved
- */
 package org.loader.glinsample.utils;
 
 import android.util.Log;
@@ -10,10 +7,6 @@ import org.loader.glin.chan.LogChan;
 import org.loader.glin.helper.LogHelper;
 import org.loader.okclient.OkClient;
 
-/**
- * <p class="note">File Note</p>
- * created by qibin at 2017/7/3 
- */
 public class Net {
 
     private static final LogHelper.LogPrinter printer = new LogHelper.LogPrinter() {
