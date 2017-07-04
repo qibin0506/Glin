@@ -40,7 +40,7 @@ compile 'org.loader:glin:2.2'
 ``` java
 compile 'org.loader:glin-okclient:2.2'
 ```
-**注意: 如果使用Glin2.2, glin-okclient就必须使用2.21以上**
+**注意: 如果使用Glin2.2, glin-okclient就必须使用2.2以上**
 
 #### 自定义解析类
 1. 通过继承`Parser`类来实现项目的数据解析类, 通常情况下需要实体类和列表类解析两种
