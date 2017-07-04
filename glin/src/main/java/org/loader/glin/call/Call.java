@@ -161,4 +161,8 @@ public abstract class Call<T> {
     public String getUrl() {
         return mUrl;
     }
+
+    public boolean shouldCache() {
+        return shouldCache;
+    }
 }

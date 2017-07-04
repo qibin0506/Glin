@@ -6,6 +6,7 @@ import org.loader.glin.helper.Helper;
 import org.loader.glin.helper.SerializeHelper;
 
 import java.io.File;
+import java.io.IOException;
 
 public class DefaultCacheProvider implements ICacheProvider {
 
@@ -17,6 +18,13 @@ public class DefaultCacheProvider implements ICacheProvider {
     public DefaultCacheProvider(String cachePath, long maxCacheSize) {
         mCachePath = cachePath.endsWith("/") ? cachePath : cachePath + "/";
         mMaxCacheSize = maxCacheSize;
+
+        File cache = new File(mCachePath);
+        if (!cache.exists()) {
+            for (int i = 0; i < 3;i++) {
+                if (cache.mkdirs()) { break;}
+            }
+        }
     }
 
     /**

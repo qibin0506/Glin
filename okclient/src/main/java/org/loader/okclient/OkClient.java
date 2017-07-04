@@ -144,12 +144,14 @@ public class OkClient implements IClient {
         Result<T> result = mClientHelper.useCache(shouldCache, cacheKey, callback);
         if (result != null) {
             callback.onResponse(result);
+            callback.afterResponse(result, null);
         }
 
         LinkedHashMap<String, String> map = (header != null && !header.isEmpty())
                 ? header : headers();
         Request.Builder builder = request.newBuilder();
         builder.tag(tag);
+
         if (map != null && !map.isEmpty()) {
             for (Map.Entry<String, String> entry : map.entrySet()) {
                 String value = entry.getValue();

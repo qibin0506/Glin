@@ -1,5 +1,4 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.novoda.bintray-release'
 
 android {
     compileSdkVersion 25
@@ -8,8 +7,8 @@ android {
     defaultConfig {
         minSdkVersion 9
         targetSdkVersion 25
-        versionCode 2
-        versionName "2.0"
+        versionCode 3
+        versionName "2.2"
 
     }
     buildTypes {
@@ -30,15 +29,6 @@ dependencies {
     compile 'com.squareup.okhttp3:okhttp:3.4.1'
     compile 'com.squareup.okio:okio:1.9.0'
 
-    compile 'org.loader:glin:2.1'
-}
-
-publish {
-    userOrg = 'qibin'
-    groupId = 'org.loader'
-    artifactId = 'glin-okclient'
-    publishVersion = '2.1'
-    desc = 'okhttp client for glin'
-    website = 'https://github.com/qibin0506/Glin'
+    compile 'org.loader:glin:2.2'
 }
 

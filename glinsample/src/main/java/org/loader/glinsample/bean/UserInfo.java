@@ -1,6 +1,8 @@
 package org.loader.glinsample.bean;
 
-public class UserInfo {
+import java.io.Serializable;
+
+public class UserInfo implements Serializable {
     private String id;
     private String name;
     private int age;
