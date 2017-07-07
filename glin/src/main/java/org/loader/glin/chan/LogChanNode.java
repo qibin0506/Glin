@@ -49,8 +49,8 @@ public class LogChanNode extends ChanNode implements Cloneable {
         } else {
             builder.append(" is cache-> false \n");
             builder.append(" status code-> ").append(ctx.getRawResult().getStatusCode()).append("\n");
-            builder.append(" message-> ").append(replaceBlank(ctx.getRawResult().getMessage())).append("\n");
-            builder.append(" response-> ").append(replaceBlank(ctx.getRawResult().getResponse())).append("\n");
+            builder.append(" message-> ").append(ctx.getRawResult().getMessage()).append("\n");
+            builder.append(" response-> ").append(ctx.getRawResult().getResponse()).append("\n");
 
             if (ctx.getCall().shouldCache()) {
                 builder.append(" cache result-> ").append(ctx.getCall().getUrl()).append("\n");
@@ -103,17 +103,6 @@ public class LogChanNode extends ChanNode implements Cloneable {
 
         builder.append("\n================== Glin  End  Request ==================");
         mLogPrinter.print("Glin", builder.toString());
-    }
-
-    private static String replaceBlank(String str) {
-        String dest = str;
-        if (dest != null) {
-            Pattern p = Pattern.compile("\\s*|\t|\r|\n");
-            Matcher m = p.matcher(str);
-            dest = m.replaceAll("");
-        }
-
-        return dest;
     }
 
     @Override
