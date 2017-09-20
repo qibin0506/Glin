@@ -1,6 +1,7 @@
 package org.loader.glin.chan;
 
 import org.loader.glin.Context;
+import org.loader.glin.call.Call;
 
 /**
  * Created by qibin on 2016/7/13.
@@ -43,8 +44,18 @@ public abstract class ChanNode {
     }
 
     protected final void cancel() {
+        cancel(Call.DEF_HTTP_CODE_CHAN_CANCELED);
+    }
+
+    protected final void cancel(int code) {
+        cancel(code, Call.DEF_MSG_CHAN_CANCELED);
+    }
+
+    protected final void cancel(int code, String msg) {
         mNext = null;
-        if (beforeCall) { mContext.getCall().cancel();}
+        if (beforeCall) {
+            mContext.getCall().cancel(code, msg);
+        }
     }
 
     public abstract void run(Context ctx);

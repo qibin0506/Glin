@@ -16,8 +16,8 @@ import java.util.LinkedHashMap;
 
 public abstract class Call<T> {
 
-    public static final int HTTP_CODE_CHAN_CANCELED = 468;
-    public static final String MSG_CHAN_CANCELED = "chan canceled";
+    public static final int DEF_HTTP_CODE_CHAN_CANCELED = 468;
+    public static final String DEF_MSG_CHAN_CANCELED = "chan canceled";
 
     protected String mUrl;
     protected Params mParams;
@@ -140,12 +140,12 @@ public abstract class Call<T> {
 
     public abstract void exec(Callback<T> callback);
 
-    public void cancel() {
+    public void cancel(int code, String msg) {
         if (mCallback != null) {
             Result<T> result = new Result<>();
             result.ok(false);
-            result.setCode(HTTP_CODE_CHAN_CANCELED);
-            result.setMessage(MSG_CHAN_CANCELED);
+            result.setCode(code);
+            result.setMessage(msg);
             mCallback.onResponse(result);
         }
     }

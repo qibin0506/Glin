@@ -20,6 +20,9 @@ Glin, 一款灵活支持中间件的Java&Android动态代理网络框架
     8. more...
 
 ### 升级日志
+	v3.0
+		支持更加灵活的中间件cancel机制，cancel支持自定义code和message
+
     v2.3
         1. 支持中间件
         
@@ -34,13 +37,13 @@ Glin, 一款灵活支持中间件的Java&Android动态代理网络框架
 #### 获取 Glin
 在你的gradle中添加如下compile
 ``` java
-compile 'org.loader:glin:2.3'
+compile 'org.loader:glin:3.0'
 ```
 如果你不想花时间定制网络请求方式, 可使用我提供的OkClient, 添加方法如下
 ``` java
-compile 'org.loader:glin-okclient:2.3'
+compile 'org.loader:glin-okclient:3.0'
 ```
-**注意: 如果使用Glin2.3, glin-okclient就必须使用2.3以上**
+**注意: 如果使用Glin3.0, glin-okclient就必须使用2.3以上**
 
 #### 自定义解析类
 1. 通过继承`Parser`类来实现项目的数据解析类, 通常情况下需要实体类和列表类解析两种
@@ -275,7 +278,8 @@ class UserInfoChanNode extends ChanNode {
             return;
         }
         // 调用cancel方法会中断流程
-        cancel();
+        //cancel();
+ 		cancel(4000, "no user name")
     }
 }
 ```

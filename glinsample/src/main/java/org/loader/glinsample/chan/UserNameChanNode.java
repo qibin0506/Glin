@@ -38,7 +38,7 @@ public class UserNameChanNode extends ChanNode {
 
                     next();
                 } else {
-                    cancel();
+                    cancel(5000, "no username");
                 }
             }
         });

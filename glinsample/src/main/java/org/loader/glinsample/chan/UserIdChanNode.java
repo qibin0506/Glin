@@ -37,7 +37,7 @@ public class UserIdChanNode extends ChanNode {
 
                     next();
                 } else {
-                    cancel();
+                    cancel(4000, "no uid");
                 }
             }
         });

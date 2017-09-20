@@ -54,7 +54,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             int age = result.getResult().getAge();
                             Toast.makeText(MainActivity.this, uid + ";" + name + ";" + age, Toast.LENGTH_SHORT).show();
                         } else {
-                            Toast.makeText(MainActivity.this, result.getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.this, "code:" + result.getCode() + ",msg:" + result.getMessage(),
+                                    Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
