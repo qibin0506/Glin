@@ -20,8 +20,10 @@ Glin, 一款灵活支持中间件的Java&Android动态代理网络框架
     8. more...
 
 ### 升级日志
-	v3.0
-		支持更加灵活的中间件cancel机制，cancel支持自定义code和message
+
+    v3.0
+        1. 支持更加灵活的中间件cancel机制，cancel支持自定义code和message
+        
 
     v2.3
         1. 支持中间件
@@ -279,7 +281,7 @@ class UserInfoChanNode extends ChanNode {
         }
         // 调用cancel方法会中断流程
         //cancel();
- 		cancel(4000, "no user name")
+ 	cancel(4000, "no user name")
     }
 }
 ```
