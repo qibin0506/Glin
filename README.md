@@ -235,6 +235,8 @@ Glin glin = new Glin.Builder()
 
 ### 中间件支持
 
+框架自带全局日志中间件， [LogChanNode](https://github.com/qibin0506/Glin/blob/master/glin/src/main/java/org/loader/glin/chan/LogChanNode.java)
+
 #### 自定义中间件
 
 继承ChanNode类, 实现自定义中间件, 实现run(Context ctx)方法, 在run方法里调用next()方法使流程继续.
