@@ -22,7 +22,9 @@ public class GlobalChanNode extends ChanNode {
         if (globalChanNodes == null) { return;}
         for (ChanNode item : globalChanNodes) {
             if (item == null) { continue;}
-            item.run(ctx);
+
+            item.beforeCall(isBeforeCall());
+            item.exec(ctx);
         }
     }
 }

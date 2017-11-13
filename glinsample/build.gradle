@@ -30,6 +30,6 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.3.1'
     testCompile 'junit:junit:4.12'
 
-    compile 'org.loader:glin-okclient:3.0'
+    compile 'org.loader:glin-okclient:3.0.2'
     compile 'com.alibaba:fastjson:1.1.56.android'
 }
