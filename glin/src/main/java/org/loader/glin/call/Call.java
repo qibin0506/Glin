@@ -152,6 +152,11 @@ public abstract class Call<T> {
         return this;
     }
 
+    public Call<T> rewriteUrl(String url) {
+        mUrl = url;
+        return this;
+    }
+
     public LinkedHashMap<String, String> getHeaders() {
         return mHeaders;
     }
@@ -166,9 +171,5 @@ public abstract class Call<T> {
 
     public boolean shouldCache() {
         return shouldCache;
-    }
-
-    public void rewriteUrl(String url) {
-        mUrl = url;
     }
 }

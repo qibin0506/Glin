@@ -29,5 +29,5 @@ dependencies {
     compile 'com.squareup.okhttp3:okhttp:3.4.1'
     compile 'com.squareup.okio:okio:1.9.0'
 
-    compile 'org.loader:glin:3.0.2'
+    compile 'org.loader:glin:3.1'
 }
