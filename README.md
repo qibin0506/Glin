@@ -22,6 +22,7 @@ Glin, 一款灵活支持中间件的Java&Android动态代理网络框架
 ### 升级日志
     
     V3.0.2
+    
         1. 新增：`Call`添加rewriteUrl方法，可用于在中间件中重写请求的URL
         
         2. 新增：添加全局中间件`GlobalChanNode`，GlobalChanNode支持添加多个`ChanNode`, 只需按照顺序添加即可
