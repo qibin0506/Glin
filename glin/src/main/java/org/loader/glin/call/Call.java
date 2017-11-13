@@ -5,10 +5,12 @@ import org.loader.glin.Context;
 import org.loader.glin.Params;
 import org.loader.glin.Result;
 import org.loader.glin.chan.ChanNode;
+import org.loader.glin.chan.GlobalChanNode;
 import org.loader.glin.chan.LogChanNode;
 import org.loader.glin.client.IClient;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 
 /**
  * Created by qibin on 2016/7/13.
@@ -31,40 +33,19 @@ public abstract class Call<T> {
     private ChanNode mBeforeChanNode;
     private ChanNode mAfterChanNode;
 
-    private ChanNode mRequestLogChanNode;
-    private ChanNode mResponseLogChanNode;
+    private GlobalChanNode mBeforeGlobalChanNode;
+    private GlobalChanNode mAfterGlobalChanNode;
 
     private Callback<T> mCallback;
 
     public Call(IClient client, String url,
                 Params params, Object tag,
                 boolean cache) {
-        mClient = client; mUrl = url;
-        mParams = params; mTag = tag;
-
+        mClient = client;
+        mUrl = url;
+        mParams = params;
+        mTag = tag;
         shouldCache = cache;
-    }
-
-    public void setLogChanNode(LogChanNode logChanNode) {
-        mRequestLogChanNode = logChanNode;
-        mRequestLogChanNode.beforeCall(true);
-
-        try {
-            mResponseLogChanNode = logChanNode.clone();
-            mResponseLogChanNode.beforeCall(false);
-        } catch (CloneNotSupportedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public Call<T> header(LinkedHashMap<String, String> headers) {
-        mHeaders = headers;
-        return this;
-    }
-
-    public Call<T> shouldCache(boolean cache) {
-        shouldCache = cache;
-        return this;
     }
 
     public Call<T> before(ChanNode chanNode) {
@@ -113,13 +94,13 @@ public abstract class Call<T> {
     public void enqueue(Callback<T> callback) {
         mCallback = callback;
 
-        if (mRequestLogChanNode != null) {
-            before(mRequestLogChanNode);
+        if (mBeforeGlobalChanNode != null) {
+            before(mBeforeGlobalChanNode);
         }
 
-        if (mResponseLogChanNode != null) {
+        if (mAfterGlobalChanNode != null) {
             ChanNode after = mAfterChanNode;
-            mAfterChanNode = mResponseLogChanNode;
+            mAfterChanNode = mAfterGlobalChanNode;
             mAfterChanNode.nextChanNode(after);
         }
 
@@ -134,9 +115,7 @@ public abstract class Call<T> {
         exec(callback);
     }
 
-    public void exec() {
-        exec(mCallback);
-    }
+    public void exec() { exec(mCallback);}
 
     public abstract void exec(Callback<T> callback);
 
@@ -148,6 +127,29 @@ public abstract class Call<T> {
             result.setMessage(msg);
             mCallback.onResponse(result);
         }
+    }
+
+    public void setGlobalChanNode(GlobalChanNode before, GlobalChanNode after) {
+        mBeforeGlobalChanNode = before;
+        mAfterGlobalChanNode = after;
+
+        if (mBeforeGlobalChanNode != null) {
+            mBeforeGlobalChanNode.beforeCall(true);
+        }
+
+        if (mAfterGlobalChanNode != null) {
+            mAfterGlobalChanNode.beforeCall(false);
+        }
+    }
+
+    public Call<T> header(LinkedHashMap<String, String> headers) {
+        mHeaders = headers;
+        return this;
+    }
+
+    public Call<T> shouldCache(boolean cache) {
+        shouldCache = cache;
+        return this;
     }
 
     public LinkedHashMap<String, String> getHeaders() {
@@ -164,5 +166,9 @@ public abstract class Call<T> {
 
     public boolean shouldCache() {
         return shouldCache;
+    }
+
+    public void rewriteUrl(String url) {
+        mUrl = url;
     }
 }

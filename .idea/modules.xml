@@ -2,9 +2,13 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/Glin.iml" filepath="$PROJECT_DIR$/Glin.iml" />
       <module fileurl="file://$PROJECT_DIR$/GlinProject.iml" filepath="$PROJECT_DIR$/GlinProject.iml" />
       <module fileurl="file://$PROJECT_DIR$/glin/glin.iml" filepath="$PROJECT_DIR$/glin/glin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/glin/glin.iml" filepath="$PROJECT_DIR$/glin/glin.iml" />
       <module fileurl="file://$PROJECT_DIR$/glinsample/glinsample.iml" filepath="$PROJECT_DIR$/glinsample/glinsample.iml" />
+      <module fileurl="file://$PROJECT_DIR$/glinsample/glinsample.iml" filepath="$PROJECT_DIR$/glinsample/glinsample.iml" />
+      <module fileurl="file://$PROJECT_DIR$/okclient/okclient.iml" filepath="$PROJECT_DIR$/okclient/okclient.iml" />
       <module fileurl="file://$PROJECT_DIR$/okclient/okclient.iml" filepath="$PROJECT_DIR$/okclient/okclient.iml" />
     </modules>
   </component>

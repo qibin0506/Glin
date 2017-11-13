@@ -39,6 +39,7 @@ import org.loader.glin.annotation.Path;
 import org.loader.glin.annotation.ShouldCache;
 import org.loader.glin.cache.ICacheProvider;
 import org.loader.glin.call.Call;
+import org.loader.glin.chan.GlobalChanNode;
 import org.loader.glin.chan.LogChanNode;
 import org.loader.glin.client.IClient;
 import org.loader.glin.factory.CallFactory;
@@ -59,16 +60,11 @@ import java.util.Iterator;
  */
 
 public class Glin {
-    private IClient mClient;
-    private String mBaseUrl;
+    private Builder mBuilder;
     private CallFactory mCallFactory;
-    private LogChanNode mLogChanNode;
 
     private Glin(Builder builder) {
-        mClient = builder.mClient;
-        mBaseUrl = builder.mBaseUrl;
-        mLogChanNode = builder.mLogChanNode;
-
+        mBuilder = builder;
         mCallFactory = new CallFactory();
     }
 
@@ -79,7 +75,7 @@ public class Glin {
     }
 
     public void cancel(String tag) {
-        mClient.cancel(tag);
+        mBuilder.client.cancel(tag);
     }
 
     public void register(Class<? extends Annotation> key, Class<? extends Call> value) {
@@ -129,16 +125,16 @@ public class Glin {
             Constructor<? extends Call> constructor = callKlass.getConstructor(IClient.class,
                     String.class, Params.class, Object.class, boolean.class);
 
-            Call<?> call = constructor.newInstance(mClient, pair.first, pair.second,
+            Call<?> call = constructor.newInstance(mBuilder.client, pair.first, pair.second,
                     mTag, shouldCache);
 
-            if (mLogChanNode != null) { call.setLogChanNode(mLogChanNode);}
+            call.setGlobalChanNode(mBuilder.beforeGlobalChanNode, mBuilder.afterGlobalChanNode);
 
             return call;
         }
 
         private String justUrl(String path) {
-            String url = mBaseUrl == null ? "" : mBaseUrl;
+            String url = mBuilder.baseUrl == null ? "" : mBuilder.baseUrl;
             path = path == null ? "" : path;
             if (isFullUrl(path)) { url = path;}
             else { url += path;}
@@ -185,58 +181,62 @@ public class Glin {
     }
 
     public static class Builder {
-        private IClient mClient;
-        private String mBaseUrl;
-        private LogChanNode mLogChanNode;
+
+        private IClient client;
+        private String baseUrl;
+
+        private GlobalChanNode beforeGlobalChanNode;
+        private GlobalChanNode afterGlobalChanNode;
 
         public Builder() {
 
         }
 
         public Builder baseUrl(String baseUrl) {
-            mBaseUrl = baseUrl;
+            this.baseUrl = baseUrl;
             return this;
         }
 
         public Builder client(IClient client) {
-            mClient = client;
+            this.client = client;
             return this;
         }
 
-        public Builder logChanNode(LogChanNode logChanNode) {
-            mLogChanNode = logChanNode;
+        public Builder globalChanNode(GlobalChanNode before, GlobalChanNode after) {
+            this.beforeGlobalChanNode = before;
+            this.afterGlobalChanNode = after;
             return this;
         }
 
         public Builder parserFactory(ParserFactory factory) {
-            if (mClient == null) {
+            if (this.client == null) {
                 throw new UnsupportedOperationException("invoke client method first");
             }
-            mClient.parserFactory(factory);
+            this.client.parserFactory(factory);
             return this;
         }
 
         public Builder cacheProvider(ICacheProvider cacheProvider) {
-            if (mClient == null) {
+            if (this.client == null) {
                 throw new UnsupportedOperationException("invoke client method first");
             }
-            mClient.cacheProvider(cacheProvider);
+            this.client.cacheProvider(cacheProvider);
             return this;
         }
 
         public Builder timeout(long ms) {
-            if (mClient == null) {
+            if (this.client == null) {
                 throw new UnsupportedOperationException("invoke client method first");
             }
-            mClient.timeout(ms);
+            this.client.timeout(ms);
             return this;
         }
 
         public Builder resultInterceptor(IResultInterceptor interceptor) {
-            if (mClient == null) {
+            if (this.client == null) {
                 throw new UnsupportedOperationException("invoke client method first");
             }
-            mClient.resultInterceptor(interceptor);
+            this.client.resultInterceptor(interceptor);
             return this;
         }
 
