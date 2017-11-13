@@ -20,6 +20,11 @@ Glin, 一款灵活支持中间件的Java&Android动态代理网络框架
     8. more...
 
 ### 升级日志
+    
+    V3.0.1
+        1. 新增：`Call`添加rewriteUrl方法，可用于在中间件中重写请求的URL
+        2. 新增：添加全局中间件`GlobalChanNode`，GlobalChanNode支持添加多个`ChanNode`, 只需按照顺序添加即可。
+        3. 修改：现在日志中间件改用`GlobalChanNode`提供支持修改日志全局中间件方式：logChanNode -> globalChanNode(GlobalChanNode before, GlobalChanNode after)
 
     v3.0
         1. 支持更加灵活的中间件cancel机制，cancel支持自定义code和message
@@ -39,7 +44,7 @@ Glin, 一款灵活支持中间件的Java&Android动态代理网络框架
 #### 获取 Glin
 在你的gradle中添加如下compile
 ``` java
-compile 'org.loader:glin:3.0'
+compile 'org.loader:glin:3.0.1'
 ```
 如果你不想花时间定制网络请求方式, 可使用我提供的OkClient, 添加方法如下
 ``` java
@@ -235,11 +240,12 @@ Glin glin = new Glin.Builder()
 
 ### 中间件支持
 
-框架自带全局日志中间件， [LogChanNode](https://github.com/qibin0506/Glin/blob/master/glin/src/main/java/org/loader/glin/chan/LogChanNode.java)
+提供全局中间件支持(`GlobalChanNode.java`)，提供日志中间件(`LogChanNode.java`)
 
 #### 自定义中间件
 
 继承ChanNode类, 实现自定义中间件, 实现run(Context ctx)方法, 在run方法里调用next()方法使流程继续.
+如果想使用全局中间件，可在`GlobalChanNode`的构造中添加`ChanNode`.
 通过调用Call的before(ChanNode chanNode)方法设置请求前的中间件, 在调用before(ChanNode chanNode)后, 可通过使用一系列的next(ChanNode chanNode)方法设置请求前的中间件.
 通过调用Call的after(ChanNode chanNode)方法设置请求后的中间件, 在调用after(ChanNode chanNode)后, 可通过使用一系列的next(ChanNode chanNode)方法设置请求后的中间件.
 
