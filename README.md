@@ -21,7 +21,7 @@ Glin, 一款灵活支持中间件的Java&Android动态代理网络框架
 
 ### 升级日志
     
-    V3.0.2
+    V3.1
     
         1. 新增：`Call`添加rewriteUrl方法，可用于在中间件中重写请求的URL
         
@@ -29,7 +29,7 @@ Glin, 一款灵活支持中间件的Java&Android动态代理网络框架
         
         3. 修改：现在日志中间件改用`GlobalChanNode`提供支持修改日志全局中间件方式：logChanNode -> globalChanNode(GlobalChanNode before, GlobalChanNode after)
         
-        4. glinsample适配Glin3.0.2, 添加权限处理
+        4. glinsample适配Glin3.1, 添加权限处理
         
         
     v3.0
@@ -50,11 +50,11 @@ Glin, 一款灵活支持中间件的Java&Android动态代理网络框架
 #### 获取 Glin
 在你的gradle中添加如下compile
 ``` java
-compile 'org.loader:glin:3.0.2'
+compile 'org.loader:glin:3.1'
 ```
 如果你不想花时间定制网络请求方式, 可使用我提供的OkClient, 添加方法如下
 ``` java
-compile 'org.loader:glin-okclient:3.0.2'
+compile 'org.loader:glin-okclient:3.1'
 ```
 **注意: 如果使用Glin3.0, glin-okclient就必须使用2.3以上**
 
