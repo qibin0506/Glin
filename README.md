@@ -20,8 +20,13 @@ Glin, 一款灵活支持中间件的Java&Android动态代理网络框架
     8. more...
 
 ### 升级日志
+
+    v3.2
     
-    
+        1. 修复使用@POST请求，无参数时系统崩溃错误
+        
+        2. 删除默认序列化函数异常的日志打印
+    
     v3.1
     
         1. 新增：`Call`添加rewriteUrl方法，可用于在中间件中重写请求的URL
@@ -51,11 +56,11 @@ Glin, 一款灵活支持中间件的Java&Android动态代理网络框架
 #### 获取 Glin
 在你的gradle中添加如下compile
 ``` java
-compile 'org.loader:glin:3.1'
+compile 'org.loader:glin:3.2'
 ```
 如果你不想花时间定制网络请求方式, 可使用我提供的OkClient, 添加方法如下
 ``` java
-compile 'org.loader:glin-okclient:3.1'
+compile 'org.loader:glin-okclient:3.2'
 ```
 **注意: 如果使用Glin3.0, glin-okclient就必须使用2.3以上**
 
