@@ -101,7 +101,7 @@ public class OkClient implements IClient {
     @Override
     public <T> void post(String url, final LinkedHashMap<String, String> header,
                          Params params, Object tag, boolean shouldCache, Callback<T> callback) {
-        MultipartBody builder = createRequestBody(params);
+        RequestBody builder = createRequestBody(params);
         Request request = new Request.Builder().url(url).post(builder).build();
         call(request, header, params.encode(), callback, tag, shouldCache);
     }
@@ -116,7 +116,7 @@ public class OkClient implements IClient {
     @Override
     public <T> void put(String url, final LinkedHashMap<String, String> header,
                         Params params, Object tag, boolean shouldCache, Callback<T> callback) {
-        MultipartBody builder = createRequestBody(params);
+        RequestBody builder = createRequestBody(params);
         Request request = new Request.Builder().url(url).put(builder).build();
         call(request, header, params.encode(), callback, tag, shouldCache);
     }
@@ -229,7 +229,11 @@ public class OkClient implements IClient {
         callback.afterResponse(result, rawResult);
     }
 
-    private MultipartBody createRequestBody(Params params) {
+    private RequestBody createRequestBody(Params params) {
+        if (params.isEmpty()) {
+            return MultipartBody.create(null, "");
+        }
+
         MultipartBody.Builder builder = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM);
 

@@ -10,6 +10,7 @@ import java.util.LinkedHashMap;
  */
 
 public interface IRequest {
+
     <T> void get(final String url, final LinkedHashMap<String, String> header, final Object tag,
                  final boolean shouldCache, final Callback<T> callback);
 

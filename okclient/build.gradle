@@ -7,8 +7,8 @@ android {
     defaultConfig {
         minSdkVersion 9
         targetSdkVersion 25
-        versionCode 6
-        versionName "3.0.2"
+        versionCode 8
+        versionName "3.2"
 
     }
     buildTypes {
@@ -29,5 +29,5 @@ dependencies {
     compile 'com.squareup.okhttp3:okhttp:3.4.1'
     compile 'com.squareup.okio:okio:1.9.0'
 
-    compile 'org.loader:glin:3.1'
+    compile 'org.loader:glin:3.2'
 }

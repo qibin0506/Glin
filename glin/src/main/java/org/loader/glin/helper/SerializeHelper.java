@@ -18,15 +18,15 @@ public class SerializeHelper {
             Object obj = ois.readObject();
             return (T) obj;
         } catch (IOException e) {
-            e.printStackTrace();
+            // empty
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            // empty
         } finally {
             if (ois != null) {
                 try {
                     ois.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    // empty
                 }
             }
         }
